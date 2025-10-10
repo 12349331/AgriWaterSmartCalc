@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(.specify/scripts/bash/setup-plan.sh:*)",
+      "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(cat:*)",
+      "Bash(if [ -d \"/Users/lokunlim/speckit_test/AquaMetrics/specs/003-/checklists\" ])",
+      "Bash(then find /Users/lokunlim/speckit_test/AquaMetrics/specs/003-/checklists -name \"*.md\" -type f)",
+      "Bash(else echo \"No checklists directory\")",
+      "Bash(fi)",
+      "Bash(npm test:*)",
+      "Bash(tree:*)",
+      "Bash(test:*)",
+      "Bash(pkill:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(lsof:*)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
