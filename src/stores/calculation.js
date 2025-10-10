@@ -90,7 +90,6 @@ export const useCalculationStore = defineStore("calculation", () => {
       try {
         return determineBillingSeason(billingPeriodStart.value, billingPeriodEnd.value);
       } catch (error) {
-        console.warn('[Store] Failed to determine billing season from period:', error);
       }
     }
 
@@ -101,7 +100,6 @@ export const useCalculationStore = defineStore("calculation", () => {
       // For single date, use it as both start and end
       return determineBillingSeason(billingDate.value, billingDate.value);
     } catch (error) {
-      console.warn('[Store] Failed to determine billing season:', error);
       return billingSeason.value; // Fallback to manual selection
     }
   });
@@ -130,7 +128,6 @@ export const useCalculationStore = defineStore("calculation", () => {
     const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
     if (cacheAge < CACHE_TTL && taipowerPricing.value.length > 0) {
-      console.log("✅ 使用快取的台電定價資料");
       if (!pricingDataSource.value) {
         pricingDataSource.value = "cache";
       }
@@ -144,7 +141,6 @@ export const useCalculationStore = defineStore("calculation", () => {
         : import.meta.env.VITE_TAIPOWER_API_URL ||
           "https://service.taipower.com.tw/data/opendata/apply/file/d007008/001.json";
 
-      console.log("🔄 嘗試從台電 API 取得定價資料...");
       const response = await fetch(apiUrl, { timeout: 5000 });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -170,15 +166,12 @@ export const useCalculationStore = defineStore("calculation", () => {
         Date.now().toString()
       );
 
-      console.log("✅ 成功從台電 API 取得定價資料，共", normalizedData.length, "筆");
       pricingDataSource.value = "api";
       return normalizedData;
     } catch (error) {
-      console.warn("⚠️ 台電 API 連線失敗:", error.message);
 
       // **降級策略 1: 優先使用 001_updated.json 的完整資料**
       try {
-        console.log("🔄 嘗試使用本地完整定價資料 (001_updated.json)...");
         const localData = getTaipowerPricingData();
 
         if (localData && localData.length > 0) {
@@ -204,7 +197,6 @@ export const useCalculationStore = defineStore("calculation", () => {
           return localData;
         }
       } catch (localError) {
-        console.warn("⚠️ 本地完整定價資料載入失敗:", localError);
       }
 
       // **降級策略 2: 使用 LocalStorage 快取**
@@ -214,15 +206,12 @@ export const useCalculationStore = defineStore("calculation", () => {
           const cachedData = JSON.parse(cached);
           taipowerPricing.value = cachedData;
           pricingDataSource.value = "cache";
-          console.log("✅ 使用 LocalStorage 快取的定價資料");
           return cachedData;
         }
       } catch (cacheError) {
-        console.warn("⚠️ LocalStorage 快取讀取失敗:", cacheError);
       }
 
       // **降級策略 3: 使用簡化備援資料 (最後手段)**
-      console.warn("⚠️ 使用簡化備援定價資料 (精確度較低)");
       taipowerPricing.value = fallbackPricingData;
       pricingCacheTimestamp.value = Date.now();
       pricingDataSource.value = "fallback";
@@ -311,8 +300,8 @@ export const useCalculationStore = defineStore("calculation", () => {
 
     billingDate.value = newDate;
 
-    // Auto-update billingSeason based on date
-    const season = determineBillingSeason(newDate);
+    // Auto-update billingSeason based on date (use same date for start and end)
+    const season = determineBillingSeason(newDate, newDate);
     billingSeason.value = season;
 
     return true;
@@ -365,7 +354,6 @@ export const useCalculationStore = defineStore("calculation", () => {
         taipowerPricing.value = JSON.parse(cached);
         pricingCacheTimestamp.value = parseInt(timestamp);
         pricingDataSource.value = "cache";
-        console.log("✅ 初始化：載入快取的台電定價資料");
         return;
       }
     }
@@ -377,7 +365,6 @@ export const useCalculationStore = defineStore("calculation", () => {
         taipowerPricing.value = localData;
         pricingCacheTimestamp.value = Date.now();
         pricingDataSource.value = "local";
-        console.log("✅ 初始化：載入本地完整定價資料");
       }
     } catch (error) {
       console.warn(

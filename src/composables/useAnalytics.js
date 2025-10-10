@@ -10,7 +10,6 @@ export function useAnalytics() {
     if (!isEnabled) return;
 
     // Placeholder for analytics tracking
-    console.log("[Analytics] Event:", eventName, eventData);
 
     // Example integration points:
     // - Google Analytics: gtag('event', eventName, eventData)
@@ -21,7 +20,6 @@ export function useAnalytics() {
   function trackPageView(pageName) {
     if (!isEnabled) return;
 
-    console.log("[Analytics] Page view:", pageName);
 
     // Example: gtag('config', 'GA_MEASUREMENT_ID', { page_path: pageName })
   }

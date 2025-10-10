@@ -122,7 +122,12 @@ describe('date-validators.js', () => {
       tomorrow.setDate(tomorrow.getDate() + 1)
       const tomorrowStr = tomorrow.toISOString().split('T')[0]
 
-      const result = validateBillingPeriod('2024-07-01', tomorrowStr)
+      // Use a recent past date as start to avoid exceeding 70-day warning
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - 30)
+      const startDateStr = startDate.toISOString().split('T')[0]
+
+      const result = validateBillingPeriod(startDateStr, tomorrowStr)
       expect(result.valid).toBe(true) // Still valid, just warning
       expect(result.error).toBeNull()
       expect(result.warning).toBe('您選擇的計費期間包含未來日期,是否確定?')

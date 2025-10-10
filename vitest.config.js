@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "happy-dom",
+    exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
     setupFiles: ["./tests/setup.js"],
     coverage: {
       provider: "v8",

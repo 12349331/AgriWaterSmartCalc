@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import CalculatorForm from '@/components/CalculatorForm.vue'
+import CalculatorForm from '@/components/calculator/CalculatorForm.vue'
 import DatePicker from '@/components/DatePicker.vue'
 import { useCalculationStore } from '@/stores/calculation'
 

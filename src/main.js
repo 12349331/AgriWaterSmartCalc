@@ -20,6 +20,17 @@ const app = createApp(App);
 // Install Pinia
 app.use(createPinia());
 
+// Run data migration on startup (T023)
+import { migrateHistoryOnStartup } from "./utils/migrate-history";
+try {
+  const migratedCount = migrateHistoryOnStartup();
+  if (migratedCount > 0) {
+  } else {
+  }
+} catch (error) {
+  console.error("[AquaMetrics Migration] Error during data migration:", error);
+}
+
 // Mount app
 app.mount("#app");
 
@@ -29,10 +40,8 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
     navigator.serviceWorker
       .register("/sw.js")
       .then((registration) => {
-        console.log("SW registered:", registration);
       })
       .catch((error) => {
-        console.log("SW registration failed:", error);
       });
   });
 }

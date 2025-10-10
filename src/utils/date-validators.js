@@ -23,7 +23,7 @@ export function validateBillingPeriod(startDate, endDate) {
   if (!startDate || !endDate) {
     return {
       valid: false,
-      error: '請完整選擇電費計費期間（開始與結束日期）',
+      error: '請完整選擇電費計費期間(開始與結束日期)',
       warning: null
     }
   }
@@ -65,7 +65,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: true,
       error: null,
-      warning: `計費期間異常長（超過 ${MAX_BILLING_PERIOD_DAYS} 天），請確認日期是否正確`
+      warning: `計費期間異常長(超過 ${MAX_BILLING_PERIOD_DAYS} 天),請確認日期是否正確`
     }
   }
 
@@ -74,7 +74,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: true,
       error: null,
-      warning: '您選擇的計費期間包含未來日期，是否確定？'
+      warning: '您選擇的計費期間包含未來日期,是否確定?'
     }
   }
 
@@ -114,7 +114,19 @@ export function isWithinRange(date, minDate, maxDate) {
 export function isFutureDate(date) {
   if (!date) return false
 
-  const d = typeof date === 'string' ? new Date(date) : date
+  let d
+  if (typeof date === 'string') {
+    // For ISO date strings (YYYY-MM-DD), append time to get midnight local time
+    // Don't call setHours afterwards since it's already at midnight
+    d = new Date(date + 'T00:00:00')
+  } else if (date instanceof Date) {
+    d = new Date(date)
+    // Only normalize Date objects to midnight
+    d.setHours(0, 0, 0, 0)
+  } else {
+    return false
+  }
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 

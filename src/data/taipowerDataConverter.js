@@ -15,7 +15,6 @@ export function convertTaipowerData() {
   // 提取「表燈」分類的資料
   const biaoData = taipowerRawData["表燈"];
   if (!biaoData || !Array.isArray(biaoData)) {
-    console.warn("台電資料格式錯誤：找不到「表燈」分類");
     return [];
   }
 
@@ -105,7 +104,6 @@ export function convertTaipowerData() {
   addToResult("住宅用", "夏月", residentialSummer);
   addToResult("住宅用", "非夏月", residentialNonSummer);
 
-  console.log("✅ 成功載入台電定價資料，共", result.length, "筆級距");
 
   return result;
 }
@@ -137,7 +135,6 @@ export function normalizeTaipowerData(data) {
 
   // Case 2: Object (raw API format) - convert it
   if (data && typeof data === "object" && data["表燈"]) {
-    console.log("🔄 轉換台電 API 原始格式為標準陣列格式");
     // Temporarily replace the import to use the passed data
     const originalData = taipowerRawData;
     try {
@@ -149,7 +146,6 @@ export function normalizeTaipowerData(data) {
   }
 
   // Case 3: Invalid data
-  console.warn("⚠️ 無法識別的台電資料格式，返回空陣列");
   return [];
 }
 

@@ -88,8 +88,8 @@ describe('useCalculationStore - BillingDate Integration', () => {
     it('should determine billingSeason based on billingDate', () => {
       store.setBillingDate('2024-07-15')
       store.calculate({ usage: 350 })
-      
-      expect(store.billingSeason).toBe(determineBillingSeason('2024-07-15'))
+
+      expect(store.billingSeason).toBe(determineBillingSeason('2024-07-15', '2024-07-15'))
     })
   })
 

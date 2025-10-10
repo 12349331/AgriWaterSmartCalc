@@ -67,5 +67,8 @@ export function getCurrentTimestampTW() {
  */
 export function toTaiwanISOString(date) {
   const taiwanDate = ensureTaiwanTimezone(date)
-  return taiwanDate.toISOString().split('T')[0]
+  const year = taiwanDate.getFullYear()
+  const month = String(taiwanDate.getMonth() + 1).padStart(2, '0')
+  const day = String(taiwanDate.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }

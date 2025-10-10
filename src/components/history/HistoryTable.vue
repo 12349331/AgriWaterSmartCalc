@@ -4,21 +4,21 @@
       <h2 class="text-xl font-semibold">歷史記錄</h2>
       <div class="flex space-x-2">
         <button
-          v-if="historyStore.recordCount > 0"
+          v-if="recordsToDisplay.length > 0"
           @click="emit('export', 'csv')"
           class="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
         >
           匯出 CSV
         </button>
         <button
-          v-if="historyStore.recordCount > 0"
+          v-if="recordsToDisplay.length > 0"
           @click="emit('export', 'json')"
           class="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
         >
           匯出 JSON
         </button>
         <button
-          v-if="historyStore.recordCount > 0"
+          v-if="recordsToDisplay.length > 0"
           @click="emit('clear-all')"
           class="text-sm px-3 py-1 text-red-600 hover:text-red-800"
         >
@@ -27,8 +27,19 @@
       </div>
     </div>
 
+    <!-- Date Range Filter -->
+    <DateRangeFilter
+      v-model:startDate="filterStartDate"
+      v-model:endDate="filterEndDate"
+      @apply="applyFilter"
+      @clear="clearFilter"
+    />
+
+    <!-- Stats Summary (Always Visible FR-014) -->
+    <StatsSummary :statsSummaryData="currentStatsSummary" :showAlways="true" />
+
     <!-- Empty State -->
-    <div v-if="historyStore.recordCount === 0" class="text-center py-12">
+    <div v-if="recordsToDisplay.length === 0" class="text-center py-12">
       <svg
         class="mx-auto h-12 w-12 text-gray-400"
         fill="none"
@@ -47,15 +58,26 @@
     </div>
 
     <!-- Table -->
-    <div v-else class="overflow-x-auto">
+    <div v-else class="overflow-x-auto" data-test="history-table">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th
-              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              日期
-            </th>
+            <SortableTableHeader
+              label="計費期間"
+              sortKey="billingPeriodStart"
+              :currentSortKey="historyStore.currentSortKey"
+              :currentSortDirection="historyStore.sortDirection"
+              @sort="historyStore.setSort"
+              tooltip="電費單上的計費期間"
+            />
+            <SortableTableHeader
+              label="創建時間"
+              sortKey="timestamp"
+              :currentSortKey="historyStore.currentSortKey"
+              :currentSortDirection="historyStore.sortDirection"
+              @sort="historyStore.setSort"
+              tooltip="紀錄建立的系統時間"
+            />
             <th
               class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
@@ -85,12 +107,21 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr
-            v-for="record in historyStore.sortedRecords"
+            v-for="record in recordsToDisplay"
             :key="record.id"
             class="hover:bg-gray-50"
           >
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-              {{ formatDate(record.timestamp) }}
+            <td
+              class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
+              data-test="billing-period-start"
+            >
+              {{ formatBillingPeriod(record.billingPeriodStart, record.billingPeriodEnd) }}
+            </td>
+            <td
+              class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
+              data-test="created-time"
+            >
+              {{ formatCreatedTime(record.timestamp) }}
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
               {{ record.cropType }}
@@ -141,19 +172,53 @@
 
     <!-- Pagination (future enhancement) -->
     <div
-      v-if="historyStore.recordCount > 10"
+      v-if="recordsToDisplay.length > 10" <!-- Use recordsToDisplay.length -->
       class="mt-4 text-center text-sm text-gray-500"
     >
-      共 {{ historyStore.recordCount }} 筆記錄
+      共 {{ recordsToDisplay.length }} 筆記錄
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'; // Import ref and computed
 import { useHistoryStore } from "@/stores/history";
-import { formatDate, formatKwh, formatVolume } from "@/utils/formatters";
+import { useDateRangeFilter } from "@/composables/useDateRangeFilter"; // Import composable
+import { formatKwh, formatVolume, formatCreatedTime, formatBillingPeriod } from "@/utils/formatters";
+import SortableTableHeader from "../common/SortableTableHeader.vue"; // Adjusted path
+import DateRangeFilter from "../common/DateRangeFilter.vue"; // Import DateRangeFilter
+import StatsSummary from "../common/StatsSummary.vue"; // Import StatsSummary
 
 const historyStore = useHistoryStore();
+
+// Integrate useDateRangeFilter
+const recordsForFilter = computed(() => historyStore.sortedRecords); // Use sorted records as base
+const {
+  filterStartDate,
+  filterEndDate,
+  applyFilter,
+  clearFilter,
+  filteredRecords,
+} = useDateRangeFilter(recordsForFilter, 'billingPeriodStart');
+
+// Computed property for records to display in the table, now reflecting date filter
+const recordsToDisplay = computed(() => {
+  // If no date filter is active, display sorted records.
+  // Otherwise, display filtered and then sorted records.
+  // The useDateRangeFilter already filters based on billingPeriodStart,
+  // and the history store's sortedRecords is already sorted.
+  // To combine them, we need to apply sorting on the filtered list.
+  // However, useDateRangeFilter already receives sortedRecords, so it handles this implicitly.
+  // If we wanted to re-sort after filtering, we would do it here.
+  // For now, `filteredRecords` from the composable should be sufficient.
+  // The records passed to the composable `recordsForFilter` are already sorted.
+  return filteredRecords.value;
+});
+
+// Computed property for stats summary data
+const currentStatsSummary = computed(() => {
+  return historyStore.statsSummary(recordsToDisplay.value);
+});
 
 const emit = defineEmits(["view", "edit", "delete", "clear-all", "export"]);
 </script>

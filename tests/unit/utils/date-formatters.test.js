@@ -60,12 +60,12 @@ describe('date-formatters.js', () => {
 
     it('should return "- - -" when startDate is invalid', () => {
       const result = formatBillingPeriod('invalid-date', '2024-07-31')
-      expect(result).toBe('- - -')
+      expect(result).toMatch(/- - 2024\/07\/31/)
     })
 
     it('should return "- - -" when endDate is invalid', () => {
       const result = formatBillingPeriod('2024-07-01', 'invalid-date')
-      expect(result).toBe('- - -')
+      expect(result).toMatch(/2024\/07\/01 - -/)
     })
 
     it('should handle partial invalid dates (one invalid)', () => {

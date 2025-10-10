@@ -1,27 +1,90 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { v4 as uuidv4 } from "uuid";
+import { getCurrentTimestampTW } from "../utils/timezone"; // T024: Import timezone utility
 
 export const useHistoryStore = defineStore("history", () => {
   // State
   const records = ref([]);
+  const currentSortKey = ref('timestamp'); // T024: Default sort key
+  const sortDirection = ref('desc');     // T024: Default sort direction
 
   // Getters
   const recordCount = computed(() => records.value.length);
 
-  const sortedRecords = computed(() => {
-    return [...records.value].sort((a, b) => b.timestamp - a.timestamp);
+  const sortedRecords = computed(() => { // T024: Modify to support dual-field sorting
+    return [...records.value].sort((a, b) => {
+      let valA, valB;
+
+      // Handle sorting by billing period start or created timestamp
+      if (currentSortKey.value === 'billingPeriodStart') {
+        // Ensure billingPeriodStart exists, fallback to 0 for missing values to avoid errors
+        valA = a.billingPeriodStart ? new Date(a.billingPeriodStart).getTime() : 0;
+        valB = b.billingPeriodStart ? new Date(b.billingPeriodStart).getTime() : 0;
+      } else { // Default or 'timestamp'
+        valA = a.timestamp;
+        valB = b.timestamp;
+      }
+
+      if (sortDirection.value === 'asc') {
+        return valA - valB;
+      } else {
+        return valB - valA;
+      }
+    });
   });
 
   const getRecordById = computed(() => (id) => {
     return records.value.find((r) => r.id === id);
   });
 
-  const getRecordsByDateRange = computed(() => (startDate, endDate) => {
-    return records.value.filter((r) => {
-      const date = new Date(r.timestamp);
-      return date >= startDate && date <= endDate;
+  const filterByDateRange = computed(() => (startDate, endDate) => {
+    if (!startDate && !endDate) {
+      return records.value;
+    }
+
+    return records.value.filter((record) => {
+      const recordDate = record.billingPeriodStart ? new Date(record.billingPeriodStart) : null;
+
+      if (!recordDate) return false; // Records without billingPeriodStart are excluded from date filtering
+
+      let isAfterStart = true;
+      let isBeforeEnd = true;
+
+      if (startDate) {
+        const start = new Date(startDate);
+        isAfterStart = recordDate >= start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // Include full end day
+        isBeforeEnd = recordDate <= end;
+      }
+
+      return isAfterStart && isBeforeEnd;
     });
+  });
+
+  const statsSummary = computed(() => (filteredRecords) => {
+    if (!filteredRecords || filteredRecords.length === 0) {
+      return {
+        recordCount: 0,
+        avgWaterVolume: 0,
+        totalKwh: 0,
+      };
+    }
+
+    const recordCount = filteredRecords.length;
+    const totalMonthlyVolume = filteredRecords.reduce((sum, record) => sum + (record.monthlyVolume || 0), 0);
+    const totalCalculatedKwh = filteredRecords.reduce((sum, record) => sum + (record.calculatedKwh || 0), 0);
+
+    const avgWaterVolume = totalMonthlyVolume / recordCount;
+
+    return {
+      recordCount,
+      avgWaterVolume,
+      totalKwh: totalCalculatedKwh,
+    };
   });
 
   const getRecordsByCrop = computed(() => (cropType) => {
@@ -29,10 +92,12 @@ export const useHistoryStore = defineStore("history", () => {
   });
 
   // Actions
-  function addRecord(recordData) {
+  function addRecord(recordData) { // T024: Modify to include billingPeriodStart & billingPeriodEnd
     const newRecord = {
       id: uuidv4(),
-      timestamp: Date.now(),
+      timestamp: getCurrentTimestampTW(), // Use getCurrentTimestampTW() for GMT+8 (FR-013)
+      billingPeriodStart: recordData.billingPeriodStart || null, // Ensure these fields are saved
+      billingPeriodEnd: recordData.billingPeriodEnd || null,     // Can be null if not provided
       ...recordData,
     };
 
@@ -52,7 +117,7 @@ export const useHistoryStore = defineStore("history", () => {
     records.value[index] = {
       ...records.value[index],
       ...updates,
-      updatedAt: Date.now(),
+      updatedAt: getCurrentTimestampTW(), // Use for GMT+8
     };
 
     saveToLocalStorage();
@@ -98,13 +163,15 @@ export const useHistoryStore = defineStore("history", () => {
     }
   }
 
-  function exportToCSV() {
+  function exportToCSV() { // T024: Modify to include 3 time fields
     if (records.value.length === 0) {
       throw new Error("無歷史記錄可匯出");
     }
 
     const headers = [
-      "日期",
+      "計費期間起",
+      "計費期間迄",
+      "創建時間",
       "作物類型",
       "耕作面積(分地)",
       "電費(TWD)",
@@ -115,7 +182,9 @@ export const useHistoryStore = defineStore("history", () => {
     ];
 
     const rows = records.value.map((r) => [
-      new Date(r.timestamp).toLocaleDateString("zh-TW"),
+      r.billingPeriodStart ? new Date(r.billingPeriodStart).toLocaleDateString("zh-TW", { year: 'numeric', month: '2-digit', day: '2-digit' }) : '',
+      r.billingPeriodEnd ? new Date(r.billingPeriodEnd).toLocaleDateString("zh-TW", { year: 'numeric', month: '2-digit', day: '2-digit' }) : '',
+      new Date(r.timestamp).toLocaleDateString("zh-TW", { year: 'numeric', month: '2-digit', day: '2-digit' }),
       r.cropType,
       r.fieldArea,
       r.billAmount,
@@ -133,11 +202,13 @@ export const useHistoryStore = defineStore("history", () => {
     return csvContent;
   }
 
-  function exportToJSON() {
+  function exportToJSON() { // T024: Already handles ISO 8601 for billing periods
     if (records.value.length === 0) {
       throw new Error("無歷史記錄可匯出");
     }
-
+    // Existing records will have timestamp as Unix ms, billingPeriodStart/End as YYYY-MM-DD strings.
+    // This already aligns with the requirement for ISO 8601 for billing periods
+    // and timestamp as a number for created time.
     return JSON.stringify(records.value, null, 2);
   }
 
@@ -165,6 +236,17 @@ export const useHistoryStore = defineStore("history", () => {
     downloadFile(json, filename, "application/json");
   }
 
+  // T024: Action to set sorting
+  function setSort(key) {
+    if (currentSortKey.value === key) {
+      // Toggle direction if same key
+      sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSortKey.value = key;
+      sortDirection.value = 'desc'; // Default to descending for new sort key
+    }
+  }
+
   // Initialize
   function initialize() {
     loadFromLocalStorage();
@@ -176,11 +258,14 @@ export const useHistoryStore = defineStore("history", () => {
   return {
     // State
     records,
+    currentSortKey, // T024: Expose sort state
+    sortDirection,  // T024: Expose sort state
     // Getters
     recordCount,
     sortedRecords,
     getRecordById,
-    getRecordsByDateRange,
+    filterByDateRange,
+    statsSummary,
     getRecordsByCrop,
     // Actions
     addRecord,
@@ -191,5 +276,6 @@ export const useHistoryStore = defineStore("history", () => {
     exportToJSON,
     downloadCSV,
     downloadJSON,
+    setSort, // T024: Expose setSort action
   };
 });

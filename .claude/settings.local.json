@@ -19,7 +19,10 @@
       "Bash(npx playwright test:*)",
       "Bash(npx playwright install:*)",
       "Bash(lsof:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint:*)",
+      "mcp__zen__listmodels",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

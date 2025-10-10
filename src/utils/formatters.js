@@ -46,3 +46,28 @@ export function formatKwh(value) {
   if (typeof value !== "number" || isNaN(value)) return "-";
   return `${formatNumber(value, 1)} kWh`;
 }
+
+// T026: New formatter for created time (YYYY/MM/DD HH:mm)
+export function formatCreatedTime(timestamp) {
+  if (!timestamp) return "-";
+  const date = new Date(timestamp);
+  return date.toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false, // Use 24-hour format
+  }).replace(/上午|下午/g, ''); // Remove AM/PM if present
+}
+
+// T026: New formatter for billing period (YYYY/MM/DD - YYYY/MM/DD)
+export function formatBillingPeriod(start, end) {
+  if (!start || !end) return "-";
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const formatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
+  const formattedStart = startDate.toLocaleDateString("zh-TW", formatOptions);
+  const formattedEnd = endDate.toLocaleDateString("zh-TW", formatOptions);
+  return `${formattedStart} - ${formattedEnd}`;
+}

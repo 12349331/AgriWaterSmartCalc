@@ -10,7 +10,6 @@
  */
 export function addBillingPeriodToLegacyRecords(records) {
   if (!Array.isArray(records)) {
-    console.warn('[Migration] Invalid records array, returning empty array')
     return []
   }
 
@@ -27,12 +26,10 @@ export function addBillingPeriodToLegacyRecords(records) {
       try {
         dateStr = new Date(record.timestamp).toISOString().split('T')[0]
       } catch (error) {
-        console.warn(`[Migration] Failed to convert timestamp for record ${record.id}:`, error)
         dateStr = new Date().toISOString().split('T')[0] // 使用當前日期作為降級
       }
     } else {
       // 損壞的紀錄：使用當前日期作為降級
-      console.warn(`[Migration] Record ${record.id} has no valid timestamp, using current date`)
       dateStr = new Date().toISOString().split('T')[0]
     }
 
@@ -51,7 +48,6 @@ export function addBillingPeriodToLegacyRecords(records) {
  */
 export function migrateHistoryOnStartup(historyStore) {
   if (!historyStore || !historyStore.records) {
-    console.warn('[Migration] Invalid history store, skipping migration')
     return
   }
 
@@ -61,12 +57,10 @@ export function migrateHistoryOnStartup(historyStore) {
   const hasLegacyRecords = records.some((r) => !r.billingPeriodStart)
 
   if (!hasLegacyRecords) {
-    console.log('[Migration] No legacy records found, skipping migration')
     return
   }
 
   try {
-    console.log(`[Migration] Migrating ${records.length} history records...`)
     const migratedRecords = addBillingPeriodToLegacyRecords(records)
     historyStore.records = migratedRecords
 
@@ -75,10 +69,8 @@ export function migrateHistoryOnStartup(historyStore) {
       historyStore.saveToLocalStorage()
     }
 
-    console.log('[Migration] Migration completed successfully')
   } catch (error) {
     console.error('[Migration] Migration failed:', error)
-    console.warn('[Migration] App will continue with unmigrated data')
     // 不阻止應用啟動
   }
 }
