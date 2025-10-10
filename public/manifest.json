@@ -1,0 +1,56 @@
+{
+  "name": "智慧農業水資源管理平台",
+  "short_name": "AquaMetrics",
+  "description": "以電推水 - 透過台電電費推算農業用水量",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["agriculture", "utilities", "productivity"],
+  "lang": "zh-TW",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "label": "計算器介面"
+    },
+    {
+      "src": "/screenshot2.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "label": "歷史記錄與圖表"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "新增計算",
+      "short_name": "新增",
+      "description": "快速開始新的用水量計算",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
