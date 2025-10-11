@@ -9,3 +9,14 @@ coverage/
 *.swo
 .env
 .env.local
+
+# Development documentation and specs (kept locally, not deployed)
+specs/
+IMPLEMENTATION_SUMMARY.md
+CONSTITUTION_COMPLIANCE_REPORT.md
+TODO.md
+.claude/
+
+# Keep essential docs
+!README.md
+!CLAUDE.md
