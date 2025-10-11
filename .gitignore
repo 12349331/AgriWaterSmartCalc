@@ -17,6 +17,10 @@ CONSTITUTION_COMPLIANCE_REPORT.md
 TODO.md
 .claude/
 
+# Test reports and coverage
+test-results/
+playwright-report/
+
 # Keep essential docs
 !README.md
 !CLAUDE.md
