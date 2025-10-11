@@ -4,12 +4,13 @@
  */
 
 /**
- * Get season from timestamp
- * @param {number} timestamp - Unix timestamp
+ * Get season from date string or timestamp
+ * @param {string|number} date - Date string (YYYY-MM-DD) or Unix timestamp
  * @returns {string} Season name
  */
-export function getSeason(timestamp) {
-  const month = new Date(timestamp).getMonth() + 1; // 1-12
+export function getSeason(date) {
+  const dateObj = typeof date === 'string' ? new Date(date) : new Date(date);
+  const month = dateObj.getMonth() + 1; // 1-12
 
   if (month >= 3 && month <= 5) return "spring";
   if (month >= 6 && month <= 8) return "summer";
@@ -34,7 +35,7 @@ export function getSeasonName(season) {
 
 /**
  * Transform records for seasonal chart
- * Groups records by season and calculates average water volume
+ * Groups records by season (based on billing period start) and calculates average water volume
  * @param {Array} records - History records
  * @returns {Object} Chart data with categories and series
  */
@@ -47,7 +48,10 @@ export function transformForSeasonalChart(records) {
   };
 
   records.forEach((record) => {
-    const season = getSeason(record.timestamp);
+    // Use billingPeriodStart if available, fallback to timestamp
+    const dateForSeason = record.billingPeriodStart || record.timestamp;
+    const season = getSeason(dateForSeason);
+
     if (record.monthlyVolume) {
       seasonalData[season].total += record.monthlyVolume;
       seasonalData[season].count += 1;
@@ -109,20 +113,26 @@ export function transformForCropChart(records) {
 
 /**
  * Transform records for annual trend chart
- * Groups records by month and shows volume over time
+ * Groups records by month (based on billing period start) and shows volume over time
  * @param {Array} records - History records
  * @returns {Object} Chart data with dates and series
  */
 export function transformForAnnualChart(records) {
-  // Sort by timestamp
-  const sorted = [...records].sort((a, b) => a.timestamp - b.timestamp);
+  // Sort by billingPeriodStart if available, fallback to timestamp
+  const sorted = [...records].sort((a, b) => {
+    const dateA = a.billingPeriodStart ? new Date(a.billingPeriodStart).getTime() : a.timestamp;
+    const dateB = b.billingPeriodStart ? new Date(b.billingPeriodStart).getTime() : b.timestamp;
+    return dateA - dateB;
+  });
 
   const dates = [];
   const volumes = [];
   const kwhs = [];
 
   sorted.forEach((record) => {
-    const date = new Date(record.timestamp);
+    // Use billingPeriodStart if available, fallback to timestamp
+    const dateSource = record.billingPeriodStart || record.timestamp;
+    const date = typeof dateSource === 'string' ? new Date(dateSource) : new Date(dateSource);
     const dateStr = `${date.getFullYear()}/${(date.getMonth() + 1)
       .toString()
       .padStart(2, "0")}`;
@@ -169,7 +179,7 @@ export function calculateStats(records) {
 }
 
 /**
- * Group records by time period
+ * Group records by time period (based on billing period start)
  * @param {Array} records - History records
  * @param {string} period - 'day' | 'week' | 'month' | 'year'
  * @returns {Object} Grouped records
@@ -178,7 +188,9 @@ export function groupByPeriod(records, period = "month") {
   const grouped = {};
 
   records.forEach((record) => {
-    const date = new Date(record.timestamp);
+    // Use billingPeriodStart if available, fallback to timestamp
+    const dateSource = record.billingPeriodStart || record.timestamp;
+    const date = typeof dateSource === 'string' ? new Date(dateSource) : new Date(dateSource);
     let key;
 
     switch (period) {

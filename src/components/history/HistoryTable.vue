@@ -27,14 +27,6 @@
       </div>
     </div>
 
-    <!-- Date Range Filter -->
-    <DateRangeFilter
-      v-model:startDate="filterStartDate"
-      v-model:endDate="filterEndDate"
-      @apply="applyFilter"
-      @clear="clearFilter"
-    />
-
     <!-- Stats Summary (Always Visible FR-014) -->
     <StatsSummary :statsSummaryData="currentStatsSummary" :showAlways="true" />
 
@@ -181,38 +173,17 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'; // Import ref and computed
+import { computed } from 'vue';
 import { useHistoryStore } from "@/stores/history";
-import { useDateRangeFilter } from "@/composables/useDateRangeFilter"; // Import composable
 import { formatKwh, formatVolume, formatCreatedTime, formatBillingPeriod } from "@/utils/formatters";
-import SortableTableHeader from "../common/SortableTableHeader.vue"; // Adjusted path
-import DateRangeFilter from "../common/DateRangeFilter.vue"; // Import DateRangeFilter
-import StatsSummary from "../common/StatsSummary.vue"; // Import StatsSummary
+import SortableTableHeader from "../common/SortableTableHeader.vue";
+import StatsSummary from "../common/StatsSummary.vue";
 
 const historyStore = useHistoryStore();
 
-// Integrate useDateRangeFilter
-const recordsForFilter = computed(() => historyStore.sortedRecords); // Use sorted records as base
-const {
-  filterStartDate,
-  filterEndDate,
-  applyFilter,
-  clearFilter,
-  filteredRecords,
-} = useDateRangeFilter(recordsForFilter, 'billingPeriodStart');
-
-// Computed property for records to display in the table, now reflecting date filter
+// Computed property for records to display in the table
 const recordsToDisplay = computed(() => {
-  // If no date filter is active, display sorted records.
-  // Otherwise, display filtered and then sorted records.
-  // The useDateRangeFilter already filters based on billingPeriodStart,
-  // and the history store's sortedRecords is already sorted.
-  // To combine them, we need to apply sorting on the filtered list.
-  // However, useDateRangeFilter already receives sortedRecords, so it handles this implicitly.
-  // If we wanted to re-sort after filtering, we would do it here.
-  // For now, `filteredRecords` from the composable should be sufficient.
-  // The records passed to the composable `recordsForFilter` are already sorted.
-  return filteredRecords.value;
+  return historyStore.sortedRecords;
 });
 
 // Computed property for stats summary data

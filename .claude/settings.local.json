@@ -25,7 +25,21 @@
       "Bash(git checkout:*)",
       "Bash(git merge:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "mcp__zen__chat",
+      "mcp__zen__debug",
+      "mcp__chrome-devtools__list_pages",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "mcp__github__get_me",
+      "mcp__github__search_repositories",
+      "mcp__github__create_repository",
+      "Bash(open https://github.com/settings/tokens)",
+      "Read(//Users/lokunlim/Library/**)",
+      "Bash(git remote add:*)"
     ],
     "deny": [],
     "ask": []

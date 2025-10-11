@@ -234,6 +234,9 @@ const formData = ref({
 // Validation errors
 const errors = ref({});
 
+// Track if form has been submitted at least once
+const hasBeenSubmitted = ref(false);
+
 // Event handlers for DateRangePicker
 function handleSeasonChanged(season) {
   determinedSeason.value = season;
@@ -297,6 +300,36 @@ watch(
   { deep: true }
 );
 
+// Watch for billing period changes and auto-recalculate if form was previously submitted
+watch(
+  [billingPeriodStart, billingPeriodEnd],
+  ([newStart, newEnd], [oldStart, oldEnd]) => {
+    // Only auto-recalculate if:
+    // 1. Form has been submitted before
+    // 2. Both dates are set
+    // 3. Dates actually changed
+    // 4. No validation errors
+    // 5. All required fields are filled
+    if (
+      hasBeenSubmitted.value &&
+      newStart &&
+      newEnd &&
+      (newStart !== oldStart || newEnd !== oldEnd) &&
+      !hasErrors.value &&
+      formData.value.billAmount > 0 &&
+      formData.value.cropType &&
+      formData.value.fieldArea > 0
+    ) {
+      // Validate period before auto-submit
+      const periodValidation = validatePeriod(newStart, newEnd);
+      if (periodValidation.valid) {
+        // Auto-submit the form
+        handleSubmit();
+      }
+    }
+  }
+);
+
 function handleSubmit() {
   // User Story P1: Validate billing period first
   const periodValidation = validatePeriod(billingPeriodStart.value, billingPeriodEnd.value);
@@ -326,6 +359,9 @@ function handleSubmit() {
     billingSeason: determinedSeason.value,
   };
 
+  // Mark as submitted for auto-recalculation on date changes
+  hasBeenSubmitted.value = true;
+
   emit("submit", submissionData);
 }
 
@@ -346,6 +382,9 @@ function handleReset() {
   determinedSeason.value = null;
   periodValidationError.value = null;
   hasCrossSeasonWarning.value = false;
+
+  // Reset submission tracking
+  hasBeenSubmitted.value = false;
 
   emit("reset");
 }

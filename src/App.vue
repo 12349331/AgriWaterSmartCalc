@@ -264,6 +264,8 @@ const handleSaveRecord = () => {
       calculatedKwh: calculationStore.calculatedKwh,
       waterFlowRate: calculationStore.waterFlowRate,
       monthlyVolume: calculationStore.monthlyVolume,
+      billingPeriodStart: calculationStore.billingPeriodStart,
+      billingPeriodEnd: calculationStore.billingPeriodEnd,
     };
 
     historyStore.addRecord(recordData);
