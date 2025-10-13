@@ -70,8 +70,8 @@
           class="input-field w-full"
           :disabled="disabled"
         >
-          <option value="表燈非營業用">表燈非營業用</option>
-          <option value="表燈營業用">表燈營業用</option>
+          <option value="表燈非營業用">非營業用</option>
+          <option value="表燈營業用">營業用</option>
         </select>
       </div>
 
@@ -121,7 +121,7 @@
         </p>
       </div>
 
-      <!-- Region -->
+      <!-- Region
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
           地區
@@ -158,7 +158,7 @@
             南部
           </label>
         </div>
-      </div>
+      </div> -->
 
       <!-- Action Buttons -->
       <div class="flex space-x-3 pt-4">

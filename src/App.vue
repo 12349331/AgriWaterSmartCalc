@@ -7,10 +7,10 @@
       <!-- Main Content -->
       <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <header class="mb-6 sm:mb-8">
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
-            智慧農業水資源管理平台
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 text-center">
+            💧智慧農業水資源管理平台
           </h1>
-          <p class="text-sm sm:text-base text-gray-600 mt-1">
+          <p class="text-sm sm:text-base text-gray-600 mt-1 text-center">
             以電推水 - 農業用水量估算工具
           </p>
         </header>
