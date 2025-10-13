@@ -1,16 +1,16 @@
 <template>
   <ErrorBoundary>
-    <div id="app" class="min-h-screen bg-gray-50">
+    <div id="app" class="min-h-screen bg-background">
       <!-- Offline Notice -->
       <OfflineNotice :show="uiStore.isOffline" />
 
       <!-- Main Content -->
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <header class="mb-6 sm:mb-8">
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 text-center">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <header class="mb-8 sm:mb-12">
+          <h1 class="govuk-heading-xl text-center">
             💧智慧農業水資源管理平台
           </h1>
-          <p class="text-sm sm:text-base text-gray-600 mt-1 text-center">
+          <p class="govuk-body-l text-center text-text-secondary">
             以電推水 - 農業用水量估算工具
           </p>
         </header>
@@ -35,7 +35,7 @@
         />
 
         <!-- Calculator Form -->
-        <section class="mb-6 sm:mb-8">
+        <section class="mb-8 sm:mb-10">
           <CalculatorForm
             v-model="formData"
             :disabled="uiStore.isOffline || uiStore.isLoading"
@@ -44,7 +44,7 @@
         </section>
 
         <!-- Advanced Parameters -->
-        <section class="mb-6 sm:mb-8">
+        <section class="mb-8 sm:mb-10">
           <AdvancedParams
             v-model="pumpParams"
             v-model:show="uiStore.showAdvancedParams"
@@ -53,7 +53,7 @@
         </section>
 
         <!-- Results -->
-        <section v-if="calculationStore.hasCalculated" class="mb-6 sm:mb-8">
+        <section v-if="calculationStore.hasCalculated" class="mb-8 sm:mb-10">
           <ResultCard
             :water-flow-rate="calculationStore.waterFlowRate"
             :monthly-volume="calculationStore.monthlyVolume"
@@ -67,7 +67,7 @@
         </section>
 
         <!-- History Table -->
-        <section class="mb-6 sm:mb-8">
+        <section class="mb-8 sm:mb-10">
           <HistoryTable
             @view="handleViewRecord"
             @edit="handleEditRecord"
@@ -78,7 +78,7 @@
         </section>
 
         <!-- Dashboard Charts -->
-        <section v-if="historyStore.recordCount > 0" class="mb-6 sm:mb-8">
+        <section v-if="historyStore.recordCount > 0" class="mb-8 sm:mb-10">
           <DashboardTabs v-model:active-tab="activeTab">
             <template #seasonal>
               <SeasonalChart :records="historyStore.records" />
@@ -110,20 +110,23 @@
         v-if="showDeleteConfirm"
         class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
         @click.self="showDeleteConfirm = false"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-dialog-title"
       >
-        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
-          <h3 class="text-lg font-semibold mb-4">確認刪除</h3>
-          <p class="text-gray-600 mb-6">確定要刪除此紀錄嗎？此操作無法復原。</p>
-          <div class="flex justify-end space-x-3">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
+          <h3 id="delete-dialog-title" class="govuk-heading-m">確認刪除</h3>
+          <p class="govuk-body">確定要刪除此紀錄嗎？此操作無法復原。</p>
+          <div class="flex flex-col sm:flex-row justify-end gap-4 mt-6">
             <button
               @click="showDeleteConfirm = false"
-              class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+              class="btn-secondary"
             >
               取消
             </button>
             <button
               @click="confirmDelete"
-              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              class="btn-warning"
             >
               確定刪除
             </button>
@@ -136,22 +139,25 @@
         v-if="showClearAllConfirm"
         class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
         @click.self="showClearAllConfirm = false"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="clear-all-dialog-title"
       >
-        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
-          <h3 class="text-lg font-semibold mb-4">確認清除全部</h3>
-          <p class="text-gray-600 mb-6">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
+          <h3 id="clear-all-dialog-title" class="govuk-heading-m">確認清除全部</h3>
+          <p class="govuk-body">
             確定要清除所有歷史紀錄嗎？此操作無法復原。
           </p>
-          <div class="flex justify-end space-x-3">
+          <div class="flex flex-col sm:flex-row justify-end gap-4 mt-6">
             <button
               @click="showClearAllConfirm = false"
-              class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+              class="btn-secondary"
             >
               取消
             </button>
             <button
               @click="confirmClearAll"
-              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              class="btn-warning"
             >
               確定清除
             </button>

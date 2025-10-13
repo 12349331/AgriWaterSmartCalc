@@ -1,26 +1,29 @@
 <template>
   <div class="result-card">
-    <h2 class="text-xl font-semibold mb-4">水資源估算</h2>
+    <h2 class="govuk-heading-l">水資源估算</h2>
 
-    <form @submit.prevent="handleSubmit" class="space-y-4">
+    <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Bill Amount -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          電費金額 (TWD) <span class="text-red-500">*</span>
+      <div class="govuk-form-group">
+        <label for="usage-input" class="govuk-label">
+          電費金額 (TWD) <span class="text-danger">*</span>
         </label>
+        <p class="govuk-hint">請輸入您的電費帳單金額（新台幣）</p>
+        <p v-if="errors.billAmount" class="govuk-error-message" id="bill-amount-error">
+          {{ errors.billAmount }}
+        </p>
         <input
+          id="usage-input"
           v-model.number="formData.billAmount"
           type="number"
           step="0.01"
           class="input-field w-full"
-          :class="{ 'border-red-500': errors.billAmount }"
+          :class="{ 'border-danger': errors.billAmount }"
           placeholder="請輸入電費金額"
           :disabled="disabled"
+          :aria-describedby="errors.billAmount ? 'bill-amount-error' : undefined"
           data-testid="usage-input"
         />
-        <p v-if="errors.billAmount" class="text-red-500 text-sm mt-1">
-          {{ errors.billAmount }}
-        </p>
       </div>
 
       <!-- User Story P1: Billing Period Selection (replaces single date picker) -->
@@ -61,11 +64,12 @@
       </div>
 
       <!-- Electricity Type -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+      <div class="govuk-form-group">
+        <label for="electricity-type" class="govuk-label">
           用電種類
         </label>
         <select
+          id="electricity-type"
           v-model="formData.electricityType"
           class="input-field w-full"
           :disabled="disabled"
@@ -79,46 +83,50 @@
       <!-- User Story P1: Season is auto-determined from billing period, no manual selection -->
 
       <!-- Crop Type -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          作物類型 <span class="text-red-500">*</span>
+      <div class="govuk-form-group">
+        <label for="crop-type" class="govuk-label">
+          作物類型 <span class="text-danger">*</span>
         </label>
+        <p v-if="errors.cropType" class="govuk-error-message" id="crop-type-error">
+          {{ errors.cropType }}
+        </p>
         <select
+          id="crop-type"
           v-model="formData.cropType"
           class="input-field w-full"
-          :class="{ 'border-red-500': errors.cropType }"
+          :class="{ 'border-danger': errors.cropType }"
           :disabled="disabled"
+          :aria-describedby="errors.cropType ? 'crop-type-error' : undefined"
         >
           <option value="">請選擇作物</option>
           <option v-for="crop in cropTypes" :key="crop.id" :value="crop.name">
             {{ crop.name }} - {{ crop.description }}
           </option>
         </select>
-        <p v-if="errors.cropType" class="text-red-500 text-sm mt-1">
-          {{ errors.cropType }}
-        </p>
       </div>
 
       <!-- Field Area -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          耕作面積 (分地) <span class="text-red-500">*</span>
+      <div class="govuk-form-group">
+        <label for="field-area" class="govuk-label">
+          耕作面積 (分地) <span class="text-danger">*</span>
         </label>
+        <p class="govuk-hint" id="field-area-hint">
+          1 分地 ≈ 0.0969 公頃 ≈ 969 平方公尺
+        </p>
+        <p v-if="errors.fieldArea" class="govuk-error-message" id="field-area-error">
+          {{ errors.fieldArea }}
+        </p>
         <input
+          id="field-area"
           v-model.number="formData.fieldArea"
           type="number"
           step="0.1"
           class="input-field w-full"
-          :class="{ 'border-red-500': errors.fieldArea }"
+          :class="{ 'border-danger': errors.fieldArea }"
           placeholder="請輸入耕作面積"
           :disabled="disabled"
+          :aria-describedby="errors.fieldArea ? 'field-area-error field-area-hint' : 'field-area-hint'"
         />
-        <p v-if="errors.fieldArea" class="text-red-500 text-sm mt-1">
-          {{ errors.fieldArea }}
-        </p>
-        <p class="text-gray-500 text-sm mt-1">
-          1 分地 ≈ 0.0969 公頃 ≈ 969 平方公尺
-        </p>
       </div>
 
       <!-- Region
@@ -161,7 +169,7 @@
       </div> -->
 
       <!-- Action Buttons -->
-      <div class="flex space-x-3 pt-4">
+      <div class="flex flex-col sm:flex-row gap-4 pt-4">
         <button
           type="submit"
           data-testid="submit-button"
@@ -173,7 +181,7 @@
         <button
           type="button"
           @click="handleReset"
-          class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          class="btn-secondary"
           :disabled="disabled"
         >
           重設
