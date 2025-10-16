@@ -2,7 +2,7 @@
   <div class="result-card mt-4">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-semibold">
-        參數說明
+        進階參數調整與參數說明
       </h3>
       <button
         type="button"
@@ -16,9 +16,71 @@
 
     <div
       v-if="show"
-      class="space-y-4"
+      class="space-y-6"
     >
-      <dl class="space-y-4">
+      <!-- Pump Efficiency Input Field -->
+      <div class="govuk-form-group">
+        <label
+          for="efficiency"
+          class="govuk-label"
+        >
+          抽水效率 <span class="text-danger">*</span>
+        </label>
+        <p class="govuk-hint">
+          預設值: 0.75 (75%)，範圍: 0.0-1.0
+        </p>
+        <p
+          v-if="errors.efficiency"
+          id="efficiency-error"
+          class="govuk-error-message"
+        >
+          {{ errors.efficiency }}
+        </p>
+        <p
+          v-if="!errors.efficiency && warnings.efficiency"
+          id="efficiency-warning"
+          class="govuk-hint text-yellow-700"
+        >
+          ⚠️ {{ warnings.efficiency }}
+        </p>
+        <p
+          v-if="efficiencyWarning"
+          id="efficiency-input-warning"
+          class="govuk-hint text-yellow-700"
+        >
+          ⚠️ {{ efficiencyWarning }}
+        </p>
+        <input
+          id="efficiency"
+          :value="efficiency"
+          type="number"
+          step="0.01"
+          min="0"
+          max="1"
+          required
+          class="input-field w-full"
+          :class="{
+            'border-danger': errors.efficiency,
+            'border-yellow-500': !errors.efficiency && (warnings.efficiency || efficiencyWarning)
+          }"
+          :disabled="disabled"
+          aria-required="true"
+          :aria-invalid="errors.efficiency ? 'true' : 'false'"
+          :aria-describedby="[
+            errors.efficiency ? 'efficiency-error' : null,
+            warnings.efficiency ? 'efficiency-warning' : null,
+            efficiencyWarning ? 'efficiency-input-warning' : null
+          ].filter(Boolean).join(' ') || undefined"
+          data-testid="efficiency-input"
+          @input="emit('update:efficiency', parseFloat($event.target.value))"
+          @keydown="emit('keydown', $event)"
+          @paste="emit('paste', $event)"
+          @blur="emit('blur', $event)"
+        >
+      </div>
+
+      <!-- Parameter Explanations -->
+      <dl class="space-y-4 pt-4 border-t">
         <div>
           <dt class="font-semibold text-gray-800">
             抽水馬力 (HP)
@@ -56,7 +118,27 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  efficiency: {
+    type: Number,
+    required: true,
+  },
+  errors: {
+    type: Object,
+    default: () => ({}),
+  },
+  warnings: {
+    type: Object,
+    default: () => ({}),
+  },
+  efficiencyWarning: {
+    type: String,
+    default: null,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emit = defineEmits(['update:show'])
+const emit = defineEmits(['update:show', 'update:efficiency', 'keydown', 'paste', 'blur'])
 </script>

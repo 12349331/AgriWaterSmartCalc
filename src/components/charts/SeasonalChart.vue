@@ -95,7 +95,6 @@ const chartOption = computed(() => ({
       name: '平均用水量',
       type: 'line',
       data: chartData.value.data,
-      smooth: true,
       lineStyle: {
         width: 3,
         color: '#3b82f6',

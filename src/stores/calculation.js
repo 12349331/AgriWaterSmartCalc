@@ -12,7 +12,8 @@ import { isWithinRange, isFutureDate, MIN_ALLOWED_DATE, getMaxAllowedDate } from
 
 export const useCalculationStore = defineStore('calculation', () => {
   // State - Step 1: User Inputs (Bill Analysis)
-  const electricityType = ref('表燈非營業用')
+  const electricityType = ref('非營業用')
+  const timePricingCategory = ref('非時間電價') // NEW: Time pricing category
   const billingSeason = ref('夏月')
   const billAmount = ref(0)
 
@@ -32,8 +33,8 @@ export const useCalculationStore = defineStore('calculation', () => {
 
   // State - Advanced Parameters
   const pumpHorsepower = ref(5.0)
-  const pumpEfficiency = ref(0.75)
-  const wellDepth = ref(20.0)
+  const pumpEfficiency = ref(0.75) // UPDATED: Default changed from 0.75 to 0.75 (already correct)
+  const wellDepth = ref(30.0) // UPDATED: Default changed from 20.0 to 30.0
 
   // State - Taipower API Data (cached)
   const taipowerPricing = ref([])
@@ -42,6 +43,12 @@ export const useCalculationStore = defineStore('calculation', () => {
   // State - Calculation status
   const hasCalculated = ref(false)
   const pricingDataSource = ref('') // 'api' | 'local' | 'cache' | 'fallback'
+
+  // NEW: Dirty state tracking
+  const initialState = ref(null)
+  const isDirty = ref(false)
+  const dirtyFields = ref(new Set())
+  const lastModifiedTimestamp = ref(null)
 
   // Getters (Computed Properties)
   const calculatedKwh = computed(() => {
@@ -120,6 +127,19 @@ export const useCalculationStore = defineStore('calculation', () => {
       return false
     }
     return checkCrossSeasonBoundary(billingPeriodStart.value, billingPeriodEnd.value)
+  })
+
+  // NEW: Computed properties for dirty state tracking
+  const isFieldDirty = computed(() => (fieldName) => {
+    return dirtyFields.value.has(fieldName)
+  })
+
+  const getDirtyFields = computed(() => {
+    return Array.from(dirtyFields.value)
+  })
+
+  const needsRecalculation = computed(() => {
+    return isDirty.value && hasCalculated.value
   })
 
   // Actions
@@ -238,6 +258,33 @@ export const useCalculationStore = defineStore('calculation', () => {
     if (params.wellDepth !== undefined) wellDepth.value = params.wellDepth
   }
 
+  // NEW: Dirty state tracking functions
+  function markFieldDirty(fieldName) {
+    dirtyFields.value.add(fieldName)
+    isDirty.value = true
+    lastModifiedTimestamp.value = Date.now()
+  }
+
+  function saveInitialState() {
+    initialState.value = {
+      billAmount: billAmount.value,
+      electricityType: electricityType.value,
+      timePricingCategory: timePricingCategory.value,
+      billingSeason: billingSeason.value,
+      cropType: cropType.value,
+      fieldArea: fieldArea.value,
+      region: region.value,
+      pumpHorsepower: pumpHorsepower.value,
+      pumpEfficiency: pumpEfficiency.value,
+      wellDepth: wellDepth.value,
+      billingDate: billingDate.value,
+      billingPeriodStart: billingPeriodStart.value,
+      billingPeriodEnd: billingPeriodEnd.value,
+    }
+    isDirty.value = false
+    dirtyFields.value.clear()
+  }
+
   function setFormData(data) {
     if (data.billAmount !== undefined) billAmount.value = data.billAmount
     if (data.electricityType !== undefined)
@@ -275,6 +322,9 @@ export const useCalculationStore = defineStore('calculation', () => {
       timestamp: calculationTimestamp.value,
       isFutureDate: isFutureBillingDate.value,
     }
+
+    // NEW: Save initial state after calculation for dirty tracking
+    saveInitialState()
   }
 
   function setBillingDate(newDate) {
@@ -328,6 +378,8 @@ export const useCalculationStore = defineStore('calculation', () => {
 
   function reset() {
     billAmount.value = 0
+    electricityType.value = '非營業用' // NEW: Reset to default
+    timePricingCategory.value = '非時間電價' // NEW: Reset to default
     cropType.value = ''
     fieldArea.value = 0
     hasCalculated.value = false
@@ -338,6 +390,11 @@ export const useCalculationStore = defineStore('calculation', () => {
     billingPeriodEnd.value = null
     calculationTimestamp.value = null
     resultMetadata.value = null
+    // NEW: Reset dirty state
+    initialState.value = null
+    isDirty.value = false
+    dirtyFields.value.clear()
+    lastModifiedTimestamp.value = null
     // Keep advanced params (user preference)
   }
 
@@ -380,6 +437,7 @@ export const useCalculationStore = defineStore('calculation', () => {
     // State
     billAmount,
     electricityType,
+    timePricingCategory, // NEW
     billingSeason,
     cropType,
     fieldArea,
@@ -398,6 +456,11 @@ export const useCalculationStore = defineStore('calculation', () => {
     // User Story P1: Billing Period State
     billingPeriodStart,
     billingPeriodEnd,
+    // NEW: Dirty State
+    isDirty,
+    dirtyFields,
+    initialState,
+    lastModifiedTimestamp,
     // Getters
     calculatedKwh,
     waterFlowRate,
@@ -409,6 +472,10 @@ export const useCalculationStore = defineStore('calculation', () => {
     isValidBillingDate,
     // User Story P1: Billing Period Getters
     crossesSeasonBoundary,
+    // NEW: Dirty State Getters
+    isFieldDirty,
+    getDirtyFields,
+    needsRecalculation,
     // Actions
     fetchTaipowerPricing,
     setPumpParams,
@@ -416,5 +483,8 @@ export const useCalculationStore = defineStore('calculation', () => {
     setBillingDate,
     calculate,
     reset,
+    // NEW: Dirty State Actions
+    markFieldDirty,
+    saveInitialState,
   }
 })

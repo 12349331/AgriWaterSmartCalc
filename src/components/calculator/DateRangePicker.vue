@@ -13,22 +13,14 @@
         >
           電費計費起始日 <span class="text-red-500">*</span>
         </label>
-        <input
-          id="start-date"
-          data-testid="start-date-input"
-          type="date"
-          :value="startDate"
-          :min="minDate"
-          :max="maxDate"
+        <DateScrollPicker
+          :model-value="startDate"
+          :min-date="minDate"
+          :max-date="maxDate"
           :disabled="disabled"
-          :aria-label="i18n.billingPeriod.startDate"
-          :aria-invalid="hasError ? 'true' : 'false'"
-          :class="[
-            'input-field w-full',
-            { 'border-red-500': hasError }
-          ]"
-          @input="handleStartDateChange"
-        >
+          :label="i18n.billingPeriod.startDate"
+          @update:model-value="handleStartDateChange"
+        />
       </div>
 
       <!-- End Date -->
@@ -39,22 +31,14 @@
         >
           電費計費結束日 <span class="text-red-500">*</span>
         </label>
-        <input
-          id="end-date"
-          data-testid="end-date-input"
-          type="date"
-          :value="endDate"
-          :min="minDate"
-          :max="maxDate"
+        <DateScrollPicker
+          :model-value="endDate"
+          :min-date="minDate"
+          :max-date="maxDate"
           :disabled="disabled"
-          :aria-label="i18n.billingPeriod.endDate"
-          :aria-invalid="hasError ? 'true' : 'false'"
-          :class="[
-            'input-field w-full',
-            { 'border-red-500': hasError }
-          ]"
-          @input="handleEndDateChange"
-        >
+          :label="i18n.billingPeriod.endDate"
+          @update:model-value="handleEndDateChange"
+        />
       </div>
     </div>
 
@@ -163,6 +147,7 @@
 import { computed, watch } from 'vue'
 import { useBillingPeriod } from '@/composables/useBillingPeriod'
 import { MIN_ALLOWED_DATE, getMaxAllowedDate } from '@/utils/date-validators'
+import DateScrollPicker from '@/components/calculator/DateScrollPicker.vue'
 
 const props = defineProps({
   startDate: {
@@ -237,13 +222,11 @@ const hasError = computed(() => {
 })
 
 // Event handlers
-function handleStartDateChange(event) {
-  const newValue = event.target.value
+function handleStartDateChange(newValue) {
   emit('update:startDate', newValue)
 }
 
-function handleEndDateChange(event) {
-  const newValue = event.target.value
+function handleEndDateChange(newValue) {
   emit('update:endDate', newValue)
 }
 

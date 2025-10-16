@@ -17,11 +17,13 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vueuse/core": "^13.9.0",
     "echarts": "^5.5.0",
     "pinia": "^2.2.0",
     "uuid": "^10.0.0",
     "vue": "^3.5.0",
-    "vue-echarts": "^7.0.3"
+    "vue-echarts": "^7.0.3",
+    "vue-scroll-picker": "^2.0.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",

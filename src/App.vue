@@ -47,13 +47,6 @@
           />
         </section>
 
-        <!-- Advanced Parameters (now just help section) -->
-        <section class="mb-8 sm:mb-10">
-          <AdvancedParams
-            v-model:show="uiStore.showAdvancedParams"
-          />
-        </section>
-
         <!-- Results -->
         <section
           v-if="calculationStore.hasCalculated"

@@ -93,7 +93,7 @@ const chartOption = computed(() => ({
   },
   xAxis: {
     type: 'category',
-    boundaryGap: false,
+    boundaryGap: true,  // Changed to true for bar chart alignment
     data: chartData.value.dates,
     axisLabel: {
       fontSize: 11,
@@ -136,7 +136,6 @@ const chartOption = computed(() => ({
       type: 'line',
       yAxisIndex: 0,
       data: chartData.value.volumes,
-      smooth: true,
       lineStyle: {
         width: 3,
         color: '#3b82f6',

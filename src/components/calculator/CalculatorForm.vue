@@ -84,27 +84,67 @@
         </div>
       </div>
 
-      <!-- Electricity Type -->
+      <!-- Electricity Type (User Story 1: Updated) -->
       <div class="govuk-form-group">
         <label
           for="electricity-type"
           class="govuk-label"
         >
-          用電種類
+          電價種類 <span class="text-danger">*</span>
         </label>
+        <p class="govuk-hint">
+          請選擇您的電價類型(依台電分類)
+        </p>
         <select
           id="electricity-type"
           v-model="formData.electricityType"
           class="input-field w-full"
           :disabled="disabled"
+          @change="handleElectricityTypeChange"
         >
-          <option value="表燈非營業用">
+          <option value="非營業用">
             非營業用
           </option>
-          <option value="表燈營業用">
+          <option value="營業用">
             營業用
           </option>
+          <option value="住宅用">
+            住宅用
+          </option>
         </select>
+      </div>
+
+      <!-- Time Pricing Category (User Story 2) -->
+      <div class="govuk-form-group">
+        <label
+          for="time-pricing-category"
+          class="govuk-label"
+        >
+          時間種類 <span class="text-danger">*</span>
+        </label>
+        <select
+          id="time-pricing-category"
+          v-model="formData.timePricingCategory"
+          class="input-field w-full"
+          :disabled="disabled"
+        >
+          <option value="非時間電價">
+            非時間電價
+          </option>
+          <option
+            value="契約內容電價"
+            disabled
+            :title="'此功能開發中'"
+          >
+            契約內容電價(暫未開發)
+          </option>
+        </select>
+        <p
+          v-if="formData.timePricingCategory === '契約內容電價'"
+          class="govuk-hint text-yellow-700"
+        >
+          此功能開發中
+        </p>
       </div>
 
       <!-- Billing Season - REMOVED (now auto-determined by DateRangePicker) -->
@@ -260,41 +300,6 @@
           >
         </div>
 
-        <!-- Efficiency -->
-        <div class="govuk-form-group">
-          <label
-            for="efficiency"
-            class="govuk-label"
-          >
-            抽水效率 <span class="text-danger">*</span>
-          </label>
-          <p class="govuk-hint">
-            預設值: 0.75 (75%)，範圍: 0.0-1.0
-          </p>
-          <p
-            v-if="errors.efficiency"
-            id="efficiency-error"
-            class="govuk-error-message"
-          >
-            {{ errors.efficiency }}
-          </p>
-          <input
-            id="efficiency"
-            v-model.number="localPumpParams.efficiency"
-            type="number"
-            step="0.01"
-            min="0"
-            max="1"
-            required
-            class="input-field w-full"
-            :class="{ 'border-danger': errors.efficiency }"
-            :disabled="disabled"
-            aria-required="true"
-            :aria-describedby="errors.efficiency ? 'efficiency-error' : undefined"
-            data-testid="efficiency-input"
-          >
-        </div>
-
         <!-- Well Depth -->
         <div class="govuk-form-group">
           <label
@@ -304,7 +309,7 @@
             水井深度 (公尺) <span class="text-danger">*</span>
           </label>
           <p class="govuk-hint">
-            預設值: 20 公尺
+            預設值: 30 公尺
           </p>
           <p
             v-if="errors.wellDepth"
@@ -312,6 +317,13 @@
             class="govuk-error-message"
           >
             {{ errors.wellDepth }}
+          </p>
+          <p
+            v-if="!errors.wellDepth && warnings.wellDepth"
+            id="wellDepth-warning"
+            class="govuk-hint text-yellow-700"
+          >
+            ⚠️ {{ warnings.wellDepth }}
           </p>
           <input
             id="wellDepth"
@@ -321,18 +333,84 @@
             min="0"
             required
             class="input-field w-full"
-            :class="{ 'border-danger': errors.wellDepth }"
+            :class="{
+              'border-danger': errors.wellDepth,
+              'border-yellow-500': !errors.wellDepth && warnings.wellDepth
+            }"
             :disabled="disabled"
             aria-required="true"
-            :aria-describedby="errors.wellDepth ? 'wellDepth-error' : undefined"
+            :aria-invalid="errors.wellDepth ? 'true' : 'false'"
+            :aria-describedby="[
+              errors.wellDepth ? 'wellDepth-error' : null,
+              warnings.wellDepth ? 'wellDepth-warning' : null
+            ].filter(Boolean).join(' ') || undefined"
             data-testid="wellDepth-input"
           >
         </div>
       </div>
 
+      <!-- Advanced Parameters Section -->
+      <AdvancedParams
+        v-model:show="showAdvancedParams"
+        v-model:efficiency="localPumpParams.efficiency"
+        :errors="errors"
+        :warnings="warnings"
+        :efficiency-warning="efficiencyWarning"
+        :disabled="disabled"
+        @keydown="handleEfficiencyKeydown"
+        @paste="handleEfficiencyPaste"
+        @blur="handleEfficiencyBlur"
+      />
+
+      <!-- Dirty State Notification (User Story 1) -->
+      <div
+        v-if="showDirtyNotification"
+        class="govuk-notification-banner"
+        role="alert"
+        aria-labelledby="dirty-state-heading"
+      >
+        <div class="govuk-notification-banner__header">
+          <h2
+            id="dirty-state-heading"
+            class="govuk-notification-banner__title"
+          >
+            參數已變更
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <p class="govuk-body">
+            您已修改表單參數,點擊「重新計算」以更新結果。
+          </p>
+        </div>
+      </div>
+
+      <!-- T029: ARIA Live Region for Validation Announcements -->
+      <div
+        aria-live="assertive"
+        aria-atomic="true"
+        class="sr-only"
+        role="status"
+      >
+        <span v-if="validationAnnouncement">{{ validationAnnouncement }}</span>
+      </div>
+
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-4 pt-4">
+        <!-- Recalculate Button (User Story 1: shown when dirty) -->
         <button
+          v-if="showRecalculateButton"
+          type="button"
+          data-testid="recalculate-button"
+          class="btn-primary flex-1"
+          :disabled="disabled || hasErrors"
+          @click="handleRecalculate"
+        >
+          重新計算
+        </button>
+
+        <!-- Regular Calculate Button -->
+        <button
+          v-else
           type="submit"
           data-testid="submit-button"
           class="btn-primary flex-1"
@@ -340,6 +418,7 @@
         >
           計算用水量
         </button>
+
         <button
           type="button"
           class="btn-secondary"
@@ -356,8 +435,11 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
+import { useCalculationStore } from '@/stores/calculation' // NEW: For dirty state tracking
 import { useValidation } from '@/composables/useValidation'
+import { useNumericInput } from '@/composables/useNumericInput' // NEW: User Story 4
 import DateRangePicker from '@/components/calculator/DateRangePicker.vue'
+import AdvancedParams from '@/components/calculator/AdvancedParams.vue'
 import { useBillingPeriod } from '@/composables/useBillingPeriod'
 
 const props = defineProps({
@@ -374,7 +456,7 @@ const props = defineProps({
     default: () => ({
       horsepower: 5.0,
       efficiency: 0.75,
-      wellDepth: 20.0,
+      wellDepth: 30.0,
     }),
   },
 })
@@ -382,7 +464,22 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'update:pumpParams', 'submit', 'reset'])
 
 const configStore = useConfigStore()
+const calculationStore = useCalculationStore() // NEW: For dirty state tracking
 const { validateField } = useValidation()
+
+// User Story 4: Numeric input handling for pump efficiency
+const {
+  warning: efficiencyWarning,
+  handleKeydown: handleEfficiencyKeydown,
+  handlePaste: handleEfficiencyPaste,
+  handleBlur: handleEfficiencyBlur,
+  clearWarning: clearEfficiencyWarning,
+} = useNumericInput({
+  min: 0.0,
+  max: 1.0,
+  step: 0.01,
+  decimals: 2,
+})
 
 // User Story P1: Billing period management (replaces single date)
 const {
@@ -402,7 +499,8 @@ const localPumpParams = ref({ ...props.pumpParams })
 // Local form data
 const formData = ref({
   billAmount: 0,
-  electricityType: '表燈非營業用',
+  electricityType: '非營業用', // UPDATED: New default
+  timePricingCategory: '非時間電價', // NEW: User Story 2
   billingSeason: '夏月', // Will be overridden by auto-determination
   cropType: '',
   fieldArea: 0,
@@ -410,15 +508,23 @@ const formData = ref({
   ...props.modelValue,
 })
 
-// Validation errors
+// Validation errors and warnings
 const errors = ref({
   horsepower: null,
   efficiency: null,
   wellDepth: null,
 })
 
+const warnings = ref({
+  efficiency: null,
+  wellDepth: null,
+})
+
 // Track if form has been submitted at least once
 const hasBeenSubmitted = ref(false)
+
+// Track advanced parameters visibility
+const showAdvancedParams = ref(false)
 
 // Event handlers for DateRangePicker
 function handleSeasonChanged(season) {
@@ -452,25 +558,168 @@ const hasErrors = computed(() => {
   return fieldErrors || periodError
 })
 
+// NEW: Dirty state computed properties (User Story 1)
+const showDirtyNotification = computed(() => {
+  return calculationStore.needsRecalculation
+})
+
+const showRecalculateButton = computed(() => {
+  return calculationStore.needsRecalculation
+})
+
+// T029: Validation announcement for screen readers
+const validationAnnouncement = computed(() => {
+  const messages = []
+
+  // Collect all error messages
+  Object.entries(errors.value).forEach(([field, error]) => {
+    if (error) {
+      const fieldLabel = {
+        billAmount: '電費金額',
+        fieldArea: '耕作面積',
+        cropType: '作物類型',
+        horsepower: '抽水馬力',
+        efficiency: '抽水效率',
+        wellDepth: '水井深度'
+      }[field] || field
+
+      messages.push(`${fieldLabel}: ${error}`)
+    }
+  })
+
+  // Collect warning messages
+  Object.entries(warnings.value).forEach(([field, warning]) => {
+    if (warning) {
+      const fieldLabel = {
+        efficiency: '抽水效率',
+        wellDepth: '水井深度'
+      }[field] || field
+
+      messages.push(`${fieldLabel}警告: ${warning}`)
+    }
+  })
+
+  // Period validation error
+  if (periodValidationError.value) {
+    messages.push(`計費期間: ${periodValidationError.value}`)
+  }
+
+  return messages.length > 0 ? `表單驗證: ${messages.join('; ')}` : ''
+})
+
+// T032: LocalStorage persistence for form draft (24-hour expiry)
+const FORM_DRAFT_KEY = 'aquametrics_form_draft'
+const FORM_DRAFT_EXPIRY_KEY = 'aquametrics_form_draft_expiry'
+const DRAFT_EXPIRY_HOURS = 24
+
+// Save form draft to localStorage
+function saveFormDraft() {
+  const draft = {
+    formData: formData.value,
+    pumpParams: localPumpParams.value,
+    billingPeriodStart: billingPeriodStart.value,
+    billingPeriodEnd: billingPeriodEnd.value,
+  }
+
+  const expiryTime = Date.now() + (DRAFT_EXPIRY_HOURS * 60 * 60 * 1000)
+
+  try {
+    localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(draft))
+    localStorage.setItem(FORM_DRAFT_EXPIRY_KEY, expiryTime.toString())
+  } catch (error) {
+    console.warn('Failed to save form draft to localStorage:', error)
+  }
+}
+
+// Restore form draft from localStorage
+function restoreFormDraft() {
+  try {
+    const expiryTime = localStorage.getItem(FORM_DRAFT_EXPIRY_KEY)
+
+    // Check if draft has expired
+    if (expiryTime && Date.now() > parseInt(expiryTime)) {
+      localStorage.removeItem(FORM_DRAFT_KEY)
+      localStorage.removeItem(FORM_DRAFT_EXPIRY_KEY)
+      return false
+    }
+
+    const draftString = localStorage.getItem(FORM_DRAFT_KEY)
+    if (!draftString) return false
+
+    const draft = JSON.parse(draftString)
+
+    // Restore form data (but don't overwrite if user already started typing)
+    if (draft.formData && formData.value.billAmount === 0 && !formData.value.cropType) {
+      formData.value = { ...formData.value, ...draft.formData }
+    }
+
+    // Restore pump params
+    if (draft.pumpParams) {
+      localPumpParams.value = { ...localPumpParams.value, ...draft.pumpParams }
+    }
+
+    // Restore billing period
+    if (draft.billingPeriodStart) {
+      billingPeriodStart.value = draft.billingPeriodStart
+    }
+    if (draft.billingPeriodEnd) {
+      billingPeriodEnd.value = draft.billingPeriodEnd
+    }
+
+    return true
+  } catch (error) {
+    console.warn('Failed to restore form draft from localStorage:', error)
+    return false
+  }
+}
+
+// Clear form draft from localStorage
+function clearFormDraft() {
+  try {
+    localStorage.removeItem(FORM_DRAFT_KEY)
+    localStorage.removeItem(FORM_DRAFT_EXPIRY_KEY)
+  } catch (error) {
+    console.warn('Failed to clear form draft from localStorage:', error)
+  }
+}
+
+// Restore draft on component mount
+restoreFormDraft()
+
 // Watch form data and validate
 watch(
   () => formData.value.billAmount,
   (value) => {
-    errors.value.billAmount = validateField('billAmount', value)
+    const result = validateField('billAmount', value)
+    if (typeof result === 'object') {
+      errors.value.billAmount = result.error
+    } else {
+      errors.value.billAmount = result
+    }
   },
 )
 
 watch(
   () => formData.value.fieldArea,
   (value) => {
-    errors.value.fieldArea = validateField('fieldArea', value)
+    const result = validateField('fieldArea', value)
+    if (typeof result === 'object') {
+      errors.value.fieldArea = result.error
+    } else {
+      errors.value.fieldArea = result
+    }
   },
 )
 
 watch(
   () => formData.value.cropType,
   (value) => {
-    errors.value.cropType = validateField('cropType', value)
+    const result = validateField('cropType', value)
+    if (typeof result === 'object') {
+      errors.value.cropType = result.error
+    } else {
+      errors.value.cropType = result
+    }
   },
 )
 
@@ -478,21 +727,48 @@ watch(
 watch(
   () => localPumpParams.value.horsepower,
   (value) => {
-    errors.value.horsepower = validateField('pumpHorsepower', value)
+    const result = validateField('pumpHorsepower', value)
+    // Handle both error and warning (useValidation returns {error, warning})
+    if (typeof result === 'object') {
+      errors.value.horsepower = result.error
+    } else {
+      // Backward compatibility
+      errors.value.horsepower = result
+    }
   },
 )
 
 watch(
   () => localPumpParams.value.efficiency,
   (value) => {
-    errors.value.efficiency = validateField('pumpEfficiency', value)
+    const result = validateField('pumpEfficiency', value)
+    // Handle both error and warning (useValidation returns {error, warning})
+    if (typeof result === 'object') {
+      errors.value.efficiency = result.error
+      warnings.value.efficiency = result.warning
+    } else {
+      // Backward compatibility
+      errors.value.efficiency = result
+      warnings.value.efficiency = null
+    }
+    // Clear numeric input warning when validation runs
+    clearEfficiencyWarning()
   },
 )
 
 watch(
   () => localPumpParams.value.wellDepth,
   (value) => {
-    errors.value.wellDepth = validateField('wellDepth', value)
+    const result = validateField('wellDepth', value)
+    // Handle both error and warning (useValidation returns {error, warning})
+    if (typeof result === 'object') {
+      errors.value.wellDepth = result.error
+      warnings.value.wellDepth = result.warning
+    } else {
+      // Backward compatibility
+      errors.value.wellDepth = result
+      warnings.value.wellDepth = null
+    }
   },
 )
 
@@ -501,6 +777,8 @@ watch(
   formData,
   (newValue) => {
     emit('update:modelValue', newValue)
+    // T032: Save draft when form data changes
+    saveFormDraft()
   },
   { deep: true },
 )
@@ -510,8 +788,18 @@ watch(
   localPumpParams,
   (newValue) => {
     emit('update:pumpParams', newValue)
+    // T032: Save draft when pump params change
+    saveFormDraft()
   },
   { deep: true },
+)
+
+// T032: Save draft when billing period changes
+watch(
+  [billingPeriodStart, billingPeriodEnd],
+  () => {
+    saveFormDraft()
+  },
 )
 
 // Watch for billing period changes and auto-recalculate if form was previously submitted
@@ -544,6 +832,20 @@ watch(
   },
 )
 
+// NEW: Handle electricity type change (User Story 1)
+function handleElectricityTypeChange() {
+  // Mark field as dirty if form has been calculated before
+  if (calculationStore.hasCalculated) {
+    calculationStore.markFieldDirty('electricityType')
+  }
+}
+
+// NEW: Handle recalculate button click (User Story 1)
+function handleRecalculate() {
+  // Same as submit, but explicitly for recalculation
+  handleSubmit()
+}
+
 function handleSubmit() {
   // User Story P1: Validate billing period first
   const periodValidation = validatePeriod(billingPeriodStart.value, billingPeriodEnd.value)
@@ -554,13 +856,25 @@ function handleSubmit() {
   }
 
   // User Story 004: Validate all fields including pump parameters
+  const billAmountResult = validateField('billAmount', formData.value.billAmount)
+  const fieldAreaResult = validateField('fieldArea', formData.value.fieldArea)
+  const cropTypeResult = validateField('cropType', formData.value.cropType)
+  const horsepowerResult = validateField('pumpHorsepower', localPumpParams.value.horsepower)
+  const efficiencyResult = validateField('pumpEfficiency', localPumpParams.value.efficiency)
+  const wellDepthResult = validateField('wellDepth', localPumpParams.value.wellDepth)
+
   errors.value = {
-    billAmount: validateField('billAmount', formData.value.billAmount),
-    fieldArea: validateField('fieldArea', formData.value.fieldArea),
-    cropType: validateField('cropType', formData.value.cropType),
-    horsepower: validateField('pumpHorsepower', localPumpParams.value.horsepower),
-    efficiency: validateField('pumpEfficiency', localPumpParams.value.efficiency),
-    wellDepth: validateField('wellDepth', localPumpParams.value.wellDepth),
+    billAmount: typeof billAmountResult === 'object' ? billAmountResult.error : billAmountResult,
+    fieldArea: typeof fieldAreaResult === 'object' ? fieldAreaResult.error : fieldAreaResult,
+    cropType: typeof cropTypeResult === 'object' ? cropTypeResult.error : cropTypeResult,
+    horsepower: typeof horsepowerResult === 'object' ? horsepowerResult.error : horsepowerResult,
+    efficiency: typeof efficiencyResult === 'object' ? efficiencyResult.error : efficiencyResult,
+    wellDepth: typeof wellDepthResult === 'object' ? wellDepthResult.error : wellDepthResult,
+  }
+
+  warnings.value = {
+    efficiency: typeof efficiencyResult === 'object' ? efficiencyResult.warning : null,
+    wellDepth: typeof wellDepthResult === 'object' ? wellDepthResult.warning : null,
   }
 
   // Check for errors
@@ -580,13 +894,17 @@ function handleSubmit() {
   // Mark as submitted for auto-recalculation on date changes
   hasBeenSubmitted.value = true
 
+  // T032: Clear draft on successful submission
+  clearFormDraft()
+
   emit('submit', submissionData)
 }
 
 function handleReset() {
   formData.value = {
     billAmount: 0,
-    electricityType: '表燈非營業用',
+    electricityType: '非營業用', // UPDATED: New default
+    timePricingCategory: '非時間電價', // NEW: User Story 2
     billingSeason: '夏月',
     cropType: '',
     fieldArea: 0,
@@ -598,11 +916,11 @@ function handleReset() {
     wellDepth: null,
   }
 
-  // User Story 004: Reset pump parameters to defaults
+  // User Story 004 & 005: Reset pump parameters to updated defaults
   localPumpParams.value = {
     horsepower: 5.0,
-    efficiency: 0.75,
-    wellDepth: 20.0,
+    efficiency: 0.75, // Already correct
+    wellDepth: 30.0, // UPDATED: Changed from 20 to 30
   }
 
   // User Story P1: Reset billing period
@@ -614,6 +932,9 @@ function handleReset() {
 
   // Reset submission tracking
   hasBeenSubmitted.value = false
+
+  // T032: Clear draft on reset
+  clearFormDraft()
 
   emit('reset')
 }

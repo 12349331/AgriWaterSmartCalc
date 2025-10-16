@@ -5,6 +5,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-09
 ## Active Technologies
 - JavaScript ES6+ (Vue 3.5+ Composition API) + Vue 3.5+, Pinia 2.2+, ECharts 5.x, Tailwind CSS 3.4+ (004-refactor-parameters-charts)
 - LocalStorage (for historical records and user preferences) (004-refactor-parameters-charts)
+- JavaScript ES6+ / Node.js (via Vite 5.0, no transpilation for modern browsers) + Vue 3.5+ (Composition API with `<script setup>`), Pinia 2.2+ (state management), ECharts 5.5+ (data visualization), Tailwind CSS 4.1+ (styling), vue-echarts 7.0+ (Vue wrapper for ECharts) (005-update-ui-form-fields)
+- LocalStorage (for historical calculation records and user preferences) (005-update-ui-form-fields)
 
 - JavaScript ES6+ (Modern browser-compatible, no transpilation required for deployment) (001-build-an-application)
 - JavaScript ES6+ / Vue 3.5+ (001-build-an-application)
@@ -26,10 +28,10 @@ npm test [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNO
 JavaScript ES6+ (Modern browser-compatible, no transpilation required for deployment): Follow standard conventions
 
 ## Recent Changes
+- 005-update-ui-form-fields: Added JavaScript ES6+ / Node.js (via Vite 5.0, no transpilation for modern browsers) + Vue 3.5+ (Composition API with `<script setup>`), Pinia 2.2+ (state management), ECharts 5.5+ (data visualization), Tailwind CSS 4.1+ (styling), vue-echarts 7.0+ (Vue wrapper for ECharts)
 - 004-refactor-parameters-charts: Added JavaScript ES6+ (Vue 3.5+ Composition API) + Vue 3.5+, Pinia 2.2+, ECharts 5.x, Tailwind CSS 3.4+
 
 - 001-build-an-application: Added JavaScript ES6+ / Vue 3.5+
-- 001-build-an-application: Added JavaScript ES6+ (Modern browser-compatible, no transpilation required for deployment)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
