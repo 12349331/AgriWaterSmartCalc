@@ -13,7 +13,7 @@
       </div>
       <button
         v-if="dismissible"
-        class="ml-4 flex-shrink-0"
+        class="ml-4 shrink-0"
         aria-label="關閉訊息"
         @click="handleDismiss"
       >
@@ -83,6 +83,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
+@reference "../../assets/styles/main.css";
+
 .message-container {
   @apply p-4 mb-4 border rounded-lg;
 }

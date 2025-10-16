@@ -33,7 +33,7 @@
         >
           查看錯誤詳情
         </summary>
-        <pre class="mt-2 p-4 bg-gray-100 rounded text-xs overflow-auto">{{
+        <pre class="mt-2 p-4 bg-gray-100 rounded-sm text-xs overflow-auto">{{
           errorDetails
         }}</pre>
       </details>
@@ -46,7 +46,7 @@
           重新整理頁面
         </button>
         <button
-          class="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          class="w-full px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-50"
           @click="clearAndReload"
         >
           清除資料並重新整理

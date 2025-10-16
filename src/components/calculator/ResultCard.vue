@@ -62,7 +62,7 @@
           class="mt-2 text-sm text-orange-700 flex items-start"
         >
           <svg
-            class="h-5 w-5 mr-1 flex-shrink-0"
+            class="h-5 w-5 mr-1 shrink-0"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -79,11 +79,11 @@
       <!-- Data Source Notice -->
       <div
         v-if="dataSource && dataSource !== 'api'"
-        class="mt-3 p-3 bg-gray-50 rounded text-sm"
+        class="mt-3 p-3 bg-gray-50 rounded-sm text-sm"
       >
         <div class="flex items-start">
           <svg
-            class="h-4 w-4 mr-2 flex-shrink-0 text-gray-500 mt-0.5"
+            class="h-4 w-4 mr-2 shrink-0 text-gray-500 mt-0.5"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -116,7 +116,7 @@
         </button>
         <button
           type="button"
-          class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          class="px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-50"
           @click="emit('share')"
         >
           分享

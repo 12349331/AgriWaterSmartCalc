@@ -84,7 +84,7 @@
       class="mt-2 text-sm text-red-600 flex items-start gap-2"
     >
       <svg
-        class="w-5 h-5 flex-shrink-0 mt-0.5"
+        class="w-5 h-5 shrink-0 mt-0.5"
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -104,7 +104,7 @@
       class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800 flex items-start gap-2"
     >
       <svg
-        class="w-5 h-5 flex-shrink-0 mt-0.5"
+        class="w-5 h-5 shrink-0 mt-0.5"
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -124,7 +124,7 @@
       class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800 flex items-start gap-2"
     >
       <svg
-        class="w-5 h-5 flex-shrink-0 mt-0.5"
+        class="w-5 h-5 shrink-0 mt-0.5"
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -144,7 +144,7 @@
       class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800 flex items-start gap-2"
     >
       <svg
-        class="w-5 h-5 flex-shrink-0 mt-0.5"
+        class="w-5 h-5 shrink-0 mt-0.5"
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -269,13 +269,15 @@ watch([() => props.startDate, () => props.endDate], () => {
 </script>
 
 <style scoped>
+@reference "../../assets/styles/main.css";
+
 .date-range-picker {
   @apply space-y-2;
 }
 
 .input-field {
   @apply px-3 py-2 border border-gray-300 rounded-md shadow-sm;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  @apply focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
   @apply disabled:bg-gray-100 disabled:cursor-not-allowed;
 }
 </style>

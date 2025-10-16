@@ -34,14 +34,14 @@
     <div class="flex items-center space-x-4">
       <button
         data-test="apply-filter-button"
-        class="px-4 py-2 bg-aqua-600 text-white rounded-md hover:bg-aqua-700 focus:outline-none focus:ring-2 focus:ring-aqua-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+        class="px-4 py-2 bg-aqua-600 text-white rounded-md hover:bg-aqua-700 focus:outline-hidden focus:ring-2 focus:ring-aqua-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
         @click="emitApply"
       >
         套用篩選
       </button>
       <button
         data-test="clear-filter-button"
-        class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+        class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
         @click="emitClear"
       >
         清除篩選

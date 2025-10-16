@@ -1,6 +1,231 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #1d70b8;
+  --color-primary-hover: #003078;
+  --color-danger: #d4351c;
+  --color-warning: #f47738;
+  --color-success: #00703c;
+  --color-text: #0b0c0c;
+  --color-text-secondary: #505a5f;
+  --color-border: #b1b4b6;
+  --color-background: #f3f2f1;
+
+  --text-body-s: 16px;
+  --text-body-s--line-height: 20px;
+  --text-body: 19px;
+  --text-body--line-height: 25px;
+  --text-body-l: 24px;
+  --text-body-l--line-height: 30px;
+  --text-heading-s: 19px;
+  --text-heading-s--line-height: 25px;
+  --text-heading-s--font-weight: 700;
+  --text-heading-m: 24px;
+  --text-heading-m--line-height: 30px;
+  --text-heading-m--font-weight: 700;
+  --text-heading-l: 36px;
+  --text-heading-l--line-height: 40px;
+  --text-heading-l--font-weight: 700;
+  --text-heading-xl: 48px;
+  --text-heading-xl--line-height: 50px;
+  --text-heading-xl--font-weight: 700;
+
+  --spacing-15: 15px;
+  --spacing-20: 20px;
+  --spacing-25: 25px;
+  --spacing-30: 30px;
+  --spacing-40: 40px;
+  --spacing-50: 50px;
+
+  --min-height-touch-target: 44px;
+
+  --min-width-touch-target: 44px;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* Screen reader only - for accessibility */
+@utility sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+@utility sr-only-focusable {
+  &:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* GOV.UK inspired component styles */
+@utility btn-primary {
+  /* Primary button - GOV.UK style */
+  @apply bg-primary text-white font-bold rounded-xs shadow-xs;
+  @apply px-6 py-3 text-body;
+  @apply min-h-touch-target min-w-touch-target;
+  @apply hover:bg-primary-hover focus:bg-primary-hover;
+  @apply transition-colors duration-100;
+  @apply border-none cursor-pointer;
+  /* Prevent double-click issues */
+  @apply active:top-px active:relative;
+
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+}
+@utility btn-secondary {
+  /* Secondary button - GOV.UK style */
+  @apply bg-text-secondary text-white font-bold rounded-xs shadow-xs;
+  @apply px-6 py-3 text-body;
+  @apply min-h-touch-target min-w-touch-target;
+  @apply hover:bg-text focus:bg-text;
+  @apply transition-colors duration-100;
+  @apply border-none cursor-pointer;
+}
+@utility btn-warning {
+  /* Warning button - GOV.UK style */
+  @apply bg-danger text-white font-bold rounded-xs shadow-xs;
+  @apply px-6 py-3 text-body;
+  @apply min-h-touch-target min-w-touch-target;
+  @apply hover:bg-red-700 focus:bg-red-700;
+  @apply transition-colors duration-100;
+  @apply border-none cursor-pointer;
+}
+@utility input-field {
+  /* Input field - GOV.UK style */
+  @apply border-2 border-text rounded-xs;
+  @apply px-4 py-3 text-body;
+  @apply min-h-touch-target;
+  @apply focus:outline-hidden focus:border-text focus:ring-0;
+  @apply focus:shadow-[0_0_0_3px_#ffdd00];
+  @apply transition-shadow duration-100;
+
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed bg-gray-100;
+  }
+
+  &.border-red-500 {
+    @apply border-danger;
+  }
+
+  /* Select field - GOV.UK style */
+  &select {
+    @apply appearance-none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%230b0c0c' d='M8 12L2 6h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+}
+@utility border-red-500 {
+  &.input-field {
+    @apply border-danger;
+  }
+}
+@utility govuk-label {
+  /* Label - GOV.UK style */
+  @apply block text-body font-bold mb-2 text-text;
+}
+@utility govuk-label-s {
+  @apply text-heading-s mb-2;
+}
+@utility govuk-label-m {
+  @apply text-heading-m mb-2;
+}
+@utility govuk-label-l {
+  @apply text-heading-l mb-3;
+}
+@utility govuk-form-group {
+  /* Form group - GOV.UK style */
+  @apply mb-6;
+}
+@utility govuk-error-message {
+  /* Error message - GOV.UK style */
+  @apply text-danger font-bold mb-2 text-body;
+
+  &::before {
+    content: 'Error: ';
+    @apply sr-only;
+  }
+}
+@utility result-card {
+  /* Result card - improved spacing */
+  @apply bg-white shadow-md rounded-lg;
+  @apply p-6 sm:p-8;
+  @apply border-l-4 border-primary;
+}
+@utility govuk-heading-xl {
+  /* Headings - GOV.UK style */
+  @apply text-heading-xl text-text mb-8;
+}
+@utility govuk-heading-l {
+  @apply text-heading-l text-text mb-6;
+}
+@utility govuk-heading-m {
+  @apply text-heading-m text-text mb-4;
+}
+@utility govuk-heading-s {
+  @apply text-heading-s text-text mb-3;
+}
+@utility govuk-body {
+  /* Body text - GOV.UK style */
+  @apply text-body text-text mb-4;
+}
+@utility govuk-body-l {
+  @apply text-body-l text-text mb-6;
+}
+@utility govuk-body-s {
+  @apply text-body-s text-text mb-3;
+}
+@utility govuk-hint {
+  /* Hint text */
+  @apply text-body text-text-secondary mb-3;
+}
+@utility govuk-inset-text {
+  /* Inset text */
+  @apply border-l-4 border-border pl-4 py-4 my-6;
+}
+@utility govuk-warning-text {
+  /* Warning text */
+  @apply relative pl-12 mb-6;
+
+  &::before {
+    content: '!';
+    @apply absolute left-0 top-0;
+    @apply flex items-center justify-center;
+    @apply w-10 h-10 rounded-full;
+    @apply bg-text text-white font-bold text-2xl;
+  }
+}
 
 /* GOV.UK inspired base styles for elderly-friendly design */
 @layer base {
@@ -23,192 +248,7 @@
 
   /* Ensure minimum touch target size */
   button, a, input, select, textarea {
-    min-height: theme('minHeight.touch-target');
-  }
-}
-
-/* Screen reader only - for accessibility */
-@layer utilities {
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-
-  .sr-only-focusable:focus {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: inherit;
-    margin: inherit;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
-}
-
-/* GOV.UK inspired component styles */
-@layer components {
-  /* Primary button - GOV.UK style */
-  .btn-primary {
-    @apply bg-primary text-white font-bold rounded-sm shadow-sm;
-    @apply px-6 py-3 text-body;
-    @apply min-h-touch-target min-w-touch-target;
-    @apply hover:bg-primary-hover focus:bg-primary-hover;
-    @apply transition-colors duration-100;
-    @apply border-none cursor-pointer;
-    /* Prevent double-click issues */
-    @apply active:top-px active:relative;
-  }
-
-  .btn-primary:disabled {
-    @apply opacity-50 cursor-not-allowed;
-  }
-
-  /* Secondary button - GOV.UK style */
-  .btn-secondary {
-    @apply bg-text-secondary text-white font-bold rounded-sm shadow-sm;
-    @apply px-6 py-3 text-body;
-    @apply min-h-touch-target min-w-touch-target;
-    @apply hover:bg-text focus:bg-text;
-    @apply transition-colors duration-100;
-    @apply border-none cursor-pointer;
-  }
-
-  /* Warning button - GOV.UK style */
-  .btn-warning {
-    @apply bg-danger text-white font-bold rounded-sm shadow-sm;
-    @apply px-6 py-3 text-body;
-    @apply min-h-touch-target min-w-touch-target;
-    @apply hover:bg-red-700 focus:bg-red-700;
-    @apply transition-colors duration-100;
-    @apply border-none cursor-pointer;
-  }
-
-  /* Input field - GOV.UK style */
-  .input-field {
-    @apply border-2 border-text rounded-sm;
-    @apply px-4 py-3 text-body;
-    @apply min-h-touch-target;
-    @apply focus:outline-none focus:border-text focus:ring-0;
-    @apply focus:shadow-[0_0_0_3px_#ffdd00];
-    @apply transition-shadow duration-100;
-  }
-
-  .input-field:disabled {
-    @apply opacity-50 cursor-not-allowed bg-gray-100;
-  }
-
-  .input-field.border-red-500 {
-    @apply border-danger;
-  }
-
-  /* Select field - GOV.UK style */
-  select.input-field {
-    @apply appearance-none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%230b0c0c' d='M8 12L2 6h12z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px;
-  }
-
-  /* Label - GOV.UK style */
-  .govuk-label {
-    @apply block text-body font-bold mb-2 text-text;
-  }
-
-  .govuk-label-s {
-    @apply text-heading-s mb-2;
-  }
-
-  .govuk-label-m {
-    @apply text-heading-m mb-2;
-  }
-
-  .govuk-label-l {
-    @apply text-heading-l mb-3;
-  }
-
-  /* Form group - GOV.UK style */
-  .govuk-form-group {
-    @apply mb-6;
-  }
-
-  /* Error message - GOV.UK style */
-  .govuk-error-message {
-    @apply text-danger font-bold mb-2 text-body;
-  }
-
-  .govuk-error-message::before {
-    content: "Error: ";
-    @apply sr-only;
-  }
-
-  /* Result card - improved spacing */
-  .result-card {
-    @apply bg-white shadow-md rounded-lg;
-    @apply p-6 sm:p-8;
-    @apply border-l-4 border-primary;
-  }
-
-  /* Headings - GOV.UK style */
-  .govuk-heading-xl {
-    @apply text-heading-xl text-text mb-8;
-  }
-
-  .govuk-heading-l {
-    @apply text-heading-l text-text mb-6;
-  }
-
-  .govuk-heading-m {
-    @apply text-heading-m text-text mb-4;
-  }
-
-  .govuk-heading-s {
-    @apply text-heading-s text-text mb-3;
-  }
-
-  /* Body text - GOV.UK style */
-  .govuk-body {
-    @apply text-body text-text mb-4;
-  }
-
-  .govuk-body-l {
-    @apply text-body-l text-text mb-6;
-  }
-
-  .govuk-body-s {
-    @apply text-body-s text-text mb-3;
-  }
-
-  /* Hint text */
-  .govuk-hint {
-    @apply text-body text-text-secondary mb-3;
-  }
-
-  /* Inset text */
-  .govuk-inset-text {
-    @apply border-l-4 border-border pl-4 py-4 my-6;
-  }
-
-  /* Warning text */
-  .govuk-warning-text {
-    @apply relative pl-12 mb-6;
-  }
-
-  .govuk-warning-text::before {
-    content: "!";
-    @apply absolute left-0 top-0;
-    @apply flex items-center justify-center;
-    @apply w-10 h-10 rounded-full;
-    @apply bg-text text-white font-bold text-2xl;
+    min-height: var(--min-height-touch-target);
   }
 }
 

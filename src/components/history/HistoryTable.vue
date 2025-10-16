@@ -7,14 +7,14 @@
       <div class="flex space-x-2">
         <button
           v-if="recordsToDisplay.length > 0"
-          class="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
+          class="text-sm px-3 py-1 border border-gray-300 rounded-sm hover:bg-gray-50"
           @click="emit('export', 'csv')"
         >
           匯出 CSV
         </button>
         <button
           v-if="recordsToDisplay.length > 0"
-          class="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
+          class="text-sm px-3 py-1 border border-gray-300 rounded-sm hover:bg-gray-50"
           @click="emit('export', 'json')"
         >
           匯出 JSON

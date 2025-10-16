@@ -217,14 +217,14 @@
       <div class="flex justify-end space-x-3 p-6 border-t bg-gray-50">
         <button
           v-if="!isEditMode"
-          class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+          class="px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-100"
           @click="handleEdit"
         >
           編輯
         </button>
         <button
           v-if="isEditMode"
-          class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+          class="px-4 py-2 border border-gray-300 rounded-sm hover:bg-gray-100"
           @click="handleCancel"
         >
           取消

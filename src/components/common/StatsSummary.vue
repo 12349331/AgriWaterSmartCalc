@@ -194,6 +194,8 @@ const formattedTotalKwh = computed(() => {
 </script>
 
 <style scoped>
+@reference "../../assets/styles/main.css";
+
 /* Fluent Design System - 統計摘要容器 */
 .stats-summary-container {
   @apply p-6 mb-6 rounded-xl;

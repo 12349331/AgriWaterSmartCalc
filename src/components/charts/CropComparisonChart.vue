@@ -65,7 +65,7 @@ const chartOption = computed(() => ({
   tooltip: {
     trigger: 'axis',
     axisPointer: {
-      type: 'shadow',
+      type: 'shadow-sm',
     },
     formatter: (params) => {
       const { name, value } = params[0]

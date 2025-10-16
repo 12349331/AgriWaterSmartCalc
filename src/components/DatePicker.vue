@@ -106,7 +106,7 @@ const getBoundaryInfo = () => {
           aria-labelledby="billing-date-label"
           :aria-describedby="isFuture ? 'future-date-warning' : undefined"
           data-testid="billing-date-input"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           @change="handleDateChange"
         >
         
@@ -156,7 +156,7 @@ const getBoundaryInfo = () => {
       role="alert"
     >
       <svg 
-        class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" 
+        class="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" 
         fill="currentColor" 
         viewBox="0 0 20 20"
       >
@@ -178,7 +178,7 @@ const getBoundaryInfo = () => {
       class="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-md"
     >
       <svg 
-        class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" 
+        class="w-5 h-5 text-blue-600 mt-0.5 shrink-0" 
         fill="currentColor" 
         viewBox="0 0 20 20"
       >
