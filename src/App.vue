@@ -227,7 +227,7 @@ const formData = ref({})
 const pumpParams = ref({
   horsepower: 5.0,
   efficiency: 0.75,
-  wellDepth: 20.0,
+  wellDepth: 30.0,
 })
 
 // History state
