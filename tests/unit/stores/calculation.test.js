@@ -70,8 +70,8 @@ describe('useCalculationStore - BillingDate Integration', () => {
       
       expect(calculateSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          usage: 350
-        })
+          usage: 350,
+        }),
       )
       
       // Verify internal state includes billingDate
@@ -176,7 +176,7 @@ describe('useCalculationStore - BillingDate Integration', () => {
         { date: '2024-06-01', expected: '夏月' },
         { date: '2024-09-30', expected: '夏月' },
         { date: '2024-10-01', expected: '非夏月' },
-        { date: '2024-05-31', expected: '非夏月' }
+        { date: '2024-05-31', expected: '非夏月' },
       ]
       
       boundaries.forEach(({ date, expected }) => {
@@ -197,7 +197,7 @@ describe('useCalculationStore - BillingDate Integration', () => {
       
       expect(setItemSpy).toHaveBeenCalledWith(
         expect.any(String),
-        expect.stringContaining('2024-07-15')
+        expect.stringContaining('2024-07-15'),
       )
     })
 
@@ -207,7 +207,7 @@ describe('useCalculationStore - BillingDate Integration', () => {
         billingDate: '2024-07-15',
         billingSeason: '夏月',
         usage: 350,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
       
       localStorage.setItem('aquametrics_last_calculation', JSON.stringify(storedData))

@@ -1,47 +1,47 @@
-import { createApp } from "vue";
-import { createPinia } from "pinia";
-import App from "./App.vue";
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
 
 // Import Tailwind CSS
-import "./assets/styles/main.css";
+import './assets/styles/main.css'
 
 // Import ECharts configuration (tree-shaking)
-import "./config/echarts";
+import './config/echarts'
 
 // Import performance monitoring
-import { usePerformance } from "./composables/usePerformance";
+import { usePerformance } from './composables/usePerformance'
 
 // Initialize performance monitoring
-const performance = usePerformance();
-performance.init();
+const performance = usePerformance()
+performance.init()
 
-const app = createApp(App);
+const app = createApp(App)
 
 // Install Pinia
-app.use(createPinia());
+app.use(createPinia())
 
 // Run data migration on startup (T023)
-import { migrateHistoryOnStartup } from "./utils/migrate-history";
+import { migrateHistoryOnStartup } from './utils/migrate-history'
 try {
-  const migratedCount = migrateHistoryOnStartup();
+  const migratedCount = migrateHistoryOnStartup()
   if (migratedCount > 0) {
   } else {
   }
 } catch (error) {
-  console.error("[AquaMetrics Migration] Error during data migration:", error);
+  console.error('[AquaMetrics Migration] Error during data migration:', error)
 }
 
 // Mount app
-app.mount("#app");
+app.mount('#app')
 
 // Register Service Worker (PWA support)
-if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  window.addEventListener("load", () => {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register("/sw.js")
+      .register('/sw.js')
       .then((registration) => {
       })
       .catch((error) => {
-      });
-  });
+      })
+  })
 }

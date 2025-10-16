@@ -1,26 +1,28 @@
 <template>
   <div class="result-card">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold">歷史記錄</h2>
+      <h2 class="text-xl font-semibold">
+        歷史記錄
+      </h2>
       <div class="flex space-x-2">
         <button
           v-if="recordsToDisplay.length > 0"
-          @click="emit('export', 'csv')"
           class="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
+          @click="emit('export', 'csv')"
         >
           匯出 CSV
         </button>
         <button
           v-if="recordsToDisplay.length > 0"
-          @click="emit('export', 'json')"
           class="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
+          @click="emit('export', 'json')"
         >
           匯出 JSON
         </button>
         <button
           v-if="recordsToDisplay.length > 0"
-          @click="emit('clear-all')"
           class="text-sm px-3 py-1 text-red-600 hover:text-red-800"
+          @click="emit('clear-all')"
         >
           清除全部
         </button>
@@ -28,10 +30,16 @@
     </div>
 
     <!-- Stats Summary (Always Visible FR-014) -->
-    <StatsSummary :statsSummaryData="currentStatsSummary" :showAlways="true" />
+    <StatsSummary
+      :stats-summary-data="currentStatsSummary"
+      :show-always="true"
+    />
 
     <!-- Empty State -->
-    <div v-if="recordsToDisplay.length === 0" class="text-center py-12">
+    <div
+      v-if="recordsToDisplay.length === 0"
+      class="text-center py-12"
+    >
       <svg
         class="mx-auto h-12 w-12 text-gray-400"
         fill="none"
@@ -45,30 +53,38 @@
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <p class="mt-2 text-gray-600">尚無歷史記錄</p>
-      <p class="text-sm text-gray-500">完成計算後點選「儲存紀錄」即可保存</p>
+      <p class="mt-2 text-gray-600">
+        尚無歷史記錄
+      </p>
+      <p class="text-sm text-gray-500">
+        完成計算後點選「儲存紀錄」即可保存
+      </p>
     </div>
 
     <!-- Table -->
-    <div v-else class="overflow-x-auto" data-test="history-table">
+    <div
+      v-else
+      class="overflow-x-auto"
+      data-test="history-table"
+    >
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
             <SortableTableHeader
               label="計費期間"
-              sortKey="billingPeriodStart"
-              :currentSortKey="historyStore.currentSortKey"
-              :currentSortDirection="historyStore.sortDirection"
-              @sort="historyStore.setSort"
+              sort-key="billingPeriodStart"
+              :current-sort-key="historyStore.currentSortKey"
+              :current-sort-direction="historyStore.sortDirection"
               tooltip="電費單上的計費期間"
+              @sort="historyStore.setSort"
             />
             <SortableTableHeader
               label="創建時間"
-              sortKey="timestamp"
-              :currentSortKey="historyStore.currentSortKey"
-              :currentSortDirection="historyStore.sortDirection"
-              @sort="historyStore.setSort"
+              sort-key="timestamp"
+              :current-sort-key="historyStore.currentSortKey"
+              :current-sort-direction="historyStore.sortDirection"
               tooltip="紀錄建立的系統時間"
+              @sort="historyStore.setSort"
             />
             <th
               class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -139,20 +155,20 @@
               class="px-4 py-3 whitespace-nowrap text-right text-sm space-x-2"
             >
               <button
-                @click="emit('view', record)"
                 class="text-primary hover:text-blue-700"
+                @click="emit('view', record)"
               >
                 查看
               </button>
               <button
-                @click="emit('edit', record)"
                 class="text-gray-600 hover:text-gray-800"
+                @click="emit('edit', record)"
               >
                 編輯
               </button>
               <button
-                @click="emit('delete', record.id)"
                 class="text-red-600 hover:text-red-800"
+                @click="emit('delete', record.id)"
               >
                 刪除
               </button>
@@ -164,32 +180,37 @@
 
     <!-- Pagination (future enhancement) -->
     <div
-      v-if="recordsToDisplay.length > 10" <!-- Use recordsToDisplay.length -->
-      class="mt-4 text-center text-sm text-gray-500"
+      v-if="recordsToDisplay.length > 10"
+      <!--
+      Use
+      recordsToDisplay.length
+      --
     >
+      class="mt-4 text-center text-sm text-gray-500"
+      >
       共 {{ recordsToDisplay.length }} 筆記錄
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useHistoryStore } from "@/stores/history";
-import { formatKwh, formatVolume, formatCreatedTime, formatBillingPeriod } from "@/utils/formatters";
-import SortableTableHeader from "../common/SortableTableHeader.vue";
-import StatsSummary from "../common/StatsSummary.vue";
+import { computed } from 'vue'
+import { useHistoryStore } from '@/stores/history'
+import { formatKwh, formatVolume, formatCreatedTime, formatBillingPeriod } from '@/utils/formatters'
+import SortableTableHeader from '../common/SortableTableHeader.vue'
+import StatsSummary from '../common/StatsSummary.vue'
 
-const historyStore = useHistoryStore();
+const historyStore = useHistoryStore()
 
 // Computed property for records to display in the table
 const recordsToDisplay = computed(() => {
-  return historyStore.sortedRecords;
-});
+  return historyStore.sortedRecords
+})
 
 // Computed property for stats summary data
 const currentStatsSummary = computed(() => {
-  return historyStore.statsSummary(recordsToDisplay.value);
-});
+  return historyStore.statsSummary(recordsToDisplay.value)
+})
 
-const emit = defineEmits(["view", "edit", "delete", "clear-all", "export"]);
+const emit = defineEmits(['view', 'edit', 'delete', 'clear-all', 'export'])
 </script>

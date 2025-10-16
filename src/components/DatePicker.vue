@@ -6,8 +6,8 @@ import { isFutureDate, isWithinRange, MIN_ALLOWED_DATE, getMaxAllowedDate } from
 const props = defineProps({
   modelValue: {
     type: String,
-    default: () => new Date().toISOString().split('T')[0]
-  }
+    default: () => new Date().toISOString().split('T')[0],
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'season-change'])
@@ -82,7 +82,10 @@ const getBoundaryInfo = () => {
 </script>
 
 <template>
-  <div class="space-y-2" data-testid="date-picker-container">
+  <div
+    class="space-y-2"
+    data-testid="date-picker-container"
+  >
     <!-- Date Input with Label -->
     <div class="flex flex-col">
       <label 
@@ -105,7 +108,7 @@ const getBoundaryInfo = () => {
           data-testid="billing-date-input"
           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           @change="handleDateChange"
-        />
+        >
         
         <!-- Boundary Date Indicator -->
         <div
@@ -131,9 +134,13 @@ const getBoundaryInfo = () => {
               data-testid="boundary-tooltip"
               class="absolute bottom-full right-0 mb-2 w-48 px-3 py-2 text-xs text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
             >
-              <div class="font-semibold">計價季節轉換日</div>
-              <div class="mt-1">{{ getBoundaryInfo() }}</div>
-              <div class="absolute top-full right-4 -mt-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+              <div class="font-semibold">
+                計價季節轉換日
+              </div>
+              <div class="mt-1">
+                {{ getBoundaryInfo() }}
+              </div>
+              <div class="absolute top-full right-4 -mt-1 w-2 h-2 bg-gray-900 transform rotate-45" />
             </div>
           </div>
         </div>

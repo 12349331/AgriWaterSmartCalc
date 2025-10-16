@@ -24,7 +24,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: false,
       error: '請完整選擇電費計費期間(開始與結束日期)',
-      warning: null
+      warning: null,
     }
   }
 
@@ -35,7 +35,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: false,
       error: '日期格式無效',
-      warning: null
+      warning: null,
     }
   }
 
@@ -44,7 +44,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: false,
       error: '結束日期必須晚於開始日期',
-      warning: null
+      warning: null,
     }
   }
 
@@ -55,7 +55,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: false,
       error: `日期必須在 2020/01/01 與 ${maxDate.replace(/-/g, '/')} 之間`,
-      warning: null
+      warning: null,
     }
   }
 
@@ -65,7 +65,7 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: true,
       error: null,
-      warning: `計費期間異常長(超過 ${MAX_BILLING_PERIOD_DAYS} 天),請確認日期是否正確`
+      warning: `計費期間異常長(超過 ${MAX_BILLING_PERIOD_DAYS} 天),請確認日期是否正確`,
     }
   }
 
@@ -74,14 +74,14 @@ export function validateBillingPeriod(startDate, endDate) {
     return {
       valid: true,
       error: null,
-      warning: '您選擇的計費期間包含未來日期,是否確定?'
+      warning: '您選擇的計費期間包含未來日期,是否確定?',
     }
   }
 
   return {
     valid: true,
     error: null,
-    warning: null
+    warning: null,
   }
 }
 

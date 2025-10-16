@@ -5,7 +5,9 @@
       <div class="bg-blue-50 p-6 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">總記錄數</p>
+            <p class="text-sm text-gray-600">
+              總記錄數
+            </p>
             <p class="text-3xl font-bold text-primary mt-2">
               {{ stats.totalRecords }}
             </p>
@@ -29,11 +31,15 @@
       <div class="bg-green-50 p-6 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">平均用水量</p>
+            <p class="text-sm text-gray-600">
+              平均用水量
+            </p>
             <p class="text-3xl font-bold text-green-700 mt-2">
               {{ stats.avgVolume.toFixed(1) }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">m³/月</p>
+            <p class="text-xs text-gray-500 mt-1">
+              m³/月
+            </p>
           </div>
           <svg
             class="h-12 w-12 text-green-200"
@@ -53,11 +59,15 @@
       <div class="bg-orange-50 p-6 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">超抽次數</p>
+            <p class="text-sm text-gray-600">
+              超抽次數
+            </p>
             <p class="text-3xl font-bold text-orange-600 mt-2">
               {{ stats.overExtractionCount }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">超過 2000 m³</p>
+            <p class="text-xs text-gray-500 mt-1">
+              超過 2000 m³
+            </p>
           </div>
           <svg
             class="h-12 w-12 text-orange-200"
@@ -77,11 +87,15 @@
       <div class="bg-indigo-50 p-6 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">最大用水量</p>
+            <p class="text-sm text-gray-600">
+              最大用水量
+            </p>
             <p class="text-3xl font-bold text-indigo-700 mt-2">
               {{ stats.maxVolume.toFixed(1) }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">m³</p>
+            <p class="text-xs text-gray-500 mt-1">
+              m³
+            </p>
           </div>
           <svg
             class="h-12 w-12 text-indigo-200"
@@ -99,11 +113,15 @@
       <div class="bg-purple-50 p-6 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">最小用水量</p>
+            <p class="text-sm text-gray-600">
+              最小用水量
+            </p>
             <p class="text-3xl font-bold text-purple-700 mt-2">
               {{ stats.minVolume.toFixed(1) }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">m³</p>
+            <p class="text-xs text-gray-500 mt-1">
+              m³
+            </p>
           </div>
           <svg
             class="h-12 w-12 text-purple-200"
@@ -121,11 +139,15 @@
       <div class="bg-yellow-50 p-6 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">平均用電</p>
+            <p class="text-sm text-gray-600">
+              平均用電
+            </p>
             <p class="text-3xl font-bold text-yellow-700 mt-2">
               {{ stats.avgKwh.toFixed(1) }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">kWh</p>
+            <p class="text-xs text-gray-500 mt-1">
+              kWh
+            </p>
           </div>
           <svg
             class="h-12 w-12 text-yellow-200"
@@ -142,12 +164,14 @@
 
     <!-- Additional Insights -->
     <div class="bg-gray-50 p-6 rounded-lg">
-      <h4 class="font-semibold text-gray-900 mb-4">數據洞察</h4>
+      <h4 class="font-semibold text-gray-900 mb-4">
+        數據洞察
+      </h4>
       <div class="space-y-3">
         <div class="flex items-start">
           <span
             class="inline-block w-2 h-2 bg-primary rounded-full mt-2 mr-3"
-          ></span>
+          />
           <p class="text-sm text-gray-700">
             <span
               v-if="stats.overExtractionCount > 0"
@@ -155,7 +179,10 @@
             >
               有 {{ stats.overExtractionCount }} 次記錄超過建議用水量
             </span>
-            <span v-else class="text-green-600 font-medium">
+            <span
+              v-else
+              class="text-green-600 font-medium"
+            >
               所有記錄均在建議用水量範圍內
             </span>
           </p>
@@ -163,7 +190,7 @@
         <div class="flex items-start">
           <span
             class="inline-block w-2 h-2 bg-primary rounded-full mt-2 mr-3"
-          ></span>
+          />
           <p class="text-sm text-gray-700">
             用水量變化範圍：{{ stats.minVolume.toFixed(1) }} -
             {{ stats.maxVolume.toFixed(1) }} m³ (差異
@@ -173,7 +200,7 @@
         <div class="flex items-start">
           <span
             class="inline-block w-2 h-2 bg-primary rounded-full mt-2 mr-3"
-          ></span>
+          />
           <p class="text-sm text-gray-700">
             建議定期檢視用水數據，優化灌溉策略以達到節水目標
           </p>
@@ -189,5 +216,5 @@ defineProps({
     type: Object,
     required: true,
   },
-});
+})
 </script>

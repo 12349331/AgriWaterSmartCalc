@@ -15,11 +15,11 @@ import {
   getPeriodLengthInDays,
   MIN_ALLOWED_DATE,
   getMaxAllowedDate,
-  MAX_BILLING_PERIOD_DAYS
+  MAX_BILLING_PERIOD_DAYS,
 } from '@/utils/date-validators'
 import {
   determineBillingSeason,
-  checkCrossSeasonBoundary
+  checkCrossSeasonBoundary,
 } from '@/utils/billing-seasons'
 
 /**
@@ -133,7 +133,7 @@ export function useBillingPeriod() {
       crossSeason,
       periodDays,
       longPeriod,
-      futureDates
+      futureDates,
     }
   }
 
@@ -178,6 +178,6 @@ export function useBillingPeriod() {
     getPeriodLength,
     isLongPeriod,
     hasFutureDates,
-    validateComprehensive
+    validateComprehensive,
   }
 }

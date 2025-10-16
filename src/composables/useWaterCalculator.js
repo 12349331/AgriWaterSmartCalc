@@ -6,7 +6,7 @@
 import {
   calculateWaterFlowRate,
   calculateMonthlyVolume,
-} from "@/utils/formulas";
+} from '@/utils/formulas'
 
 /**
  * Composable hook for water calculation
@@ -22,7 +22,7 @@ export function useWaterCalculator() {
    * @returns {number} Water flow rate in L/s
    */
   function calculateFlowRate(horsepower, efficiency, wellDepth) {
-    return calculateWaterFlowRate(horsepower, efficiency, wellDepth);
+    return calculateWaterFlowRate(horsepower, efficiency, wellDepth)
   }
 
   /**
@@ -36,11 +36,11 @@ export function useWaterCalculator() {
    * @returns {number} Monthly water volume in m³
    */
   function calculateVolume(flowRate, kwh, horsepower, fieldArea) {
-    return calculateMonthlyVolume(flowRate, kwh, horsepower, fieldArea);
+    return calculateMonthlyVolume(flowRate, kwh, horsepower, fieldArea)
   }
 
   return {
     calculateFlowRate,
     calculateVolume,
-  };
+  }
 }

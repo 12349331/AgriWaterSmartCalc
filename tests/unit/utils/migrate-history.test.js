@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   addBillingPeriodToLegacyRecords,
-  migrateHistoryOnStartup
+  migrateHistoryOnStartup,
 } from '../../../src/utils/migrate-history.js'
 
 describe('migrate-history.js', () => {
@@ -12,8 +12,8 @@ describe('migrate-history.js', () => {
           id: '1',
           timestamp: 1720713600000, // 2024-07-12
           billingPeriodStart: '2024-07-01',
-          billingPeriodEnd: '2024-07-31'
-        }
+          billingPeriodEnd: '2024-07-31',
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -29,8 +29,8 @@ describe('migrate-history.js', () => {
         {
           id: '1',
           timestamp: 1720713600000, // 2024-07-12T00:00:00Z
-          reading: 1500
-        }
+          reading: 1500,
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -47,8 +47,8 @@ describe('migrate-history.js', () => {
         {
           id: '1',
           timestamp: 1720713600000, // 2024-07-12
-          reading: 1500
-        }
+          reading: 1500,
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -81,7 +81,7 @@ describe('migrate-history.js', () => {
       const records = Array.from({ length: 150 }, (_, i) => ({
         id: `record-${i}`,
         timestamp: 1720713600000 + i * 86400000, // Each day apart
-        reading: 1000 + i * 10
+        reading: 1000 + i * 10,
       }))
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -103,24 +103,24 @@ describe('migrate-history.js', () => {
           id: '1',
           timestamp: 1720713600000,
           billingPeriodStart: '2024-07-01',
-          billingPeriodEnd: '2024-07-31'
+          billingPeriodEnd: '2024-07-31',
         },
         {
           id: '2',
           timestamp: 1718121600000, // No billingPeriod fields
-          reading: 1400
+          reading: 1400,
         },
         {
           id: '3',
           timestamp: 1721318400000,
           billingPeriodStart: '2024-07-10',
-          billingPeriodEnd: '2024-08-09'
+          billingPeriodEnd: '2024-08-09',
         },
         {
           id: '4',
           timestamp: 1715529600000, // No billingPeriod fields
-          reading: 1300
-        }
+          reading: 1300,
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -150,9 +150,9 @@ describe('migrate-history.js', () => {
       const records = [
         {
           id: 'corrupted-1',
-          reading: 1500
+          reading: 1500,
           // No timestamp field
-        }
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -165,7 +165,7 @@ describe('migrate-history.js', () => {
 
       // Should log warning
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Record corrupted-1 has no valid timestamp')
+        expect.stringContaining('[Migration] Record corrupted-1 has no valid timestamp'),
       )
 
       consoleSpy.mockRestore()
@@ -178,8 +178,8 @@ describe('migrate-history.js', () => {
         {
           id: 'corrupted-2',
           timestamp: 'invalid-timestamp',
-          reading: 1500
-        }
+          reading: 1500,
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -190,7 +190,7 @@ describe('migrate-history.js', () => {
       expect(result[0].billingPeriodStart).toMatch(/^\d{4}-\d{2}-\d{2}$/)
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Record corrupted-2 has no valid timestamp')
+        expect.stringContaining('[Migration] Record corrupted-2 has no valid timestamp'),
       )
 
       consoleSpy.mockRestore()
@@ -204,8 +204,8 @@ describe('migrate-history.js', () => {
           reading: 1500,
           cost: 250,
           season: '夏月',
-          notes: 'Test record'
-        }
+          notes: 'Test record',
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -216,7 +216,7 @@ describe('migrate-history.js', () => {
         reading: 1500,
         cost: 250,
         season: '夏月',
-        notes: 'Test record'
+        notes: 'Test record',
       })
       expect(result[0]).toHaveProperty('billingPeriodStart')
       expect(result[0]).toHaveProperty('billingPeriodEnd')
@@ -227,9 +227,9 @@ describe('migrate-history.js', () => {
         {
           id: '1',
           timestamp: 1720713600000,
-          billingPeriodStart: '2024-07-01'
+          billingPeriodStart: '2024-07-01',
           // Missing billingPeriodEnd
-        }
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -246,9 +246,9 @@ describe('migrate-history.js', () => {
         {
           id: '1',
           timestamp: 1720713600000,
-          billingPeriodEnd: '2024-07-31'
+          billingPeriodEnd: '2024-07-31',
           // Missing billingPeriodStart
-        }
+        },
       ]
 
       const result = addBillingPeriodToLegacyRecords(records)
@@ -270,16 +270,16 @@ describe('migrate-history.js', () => {
           {
             id: '1',
             timestamp: 1720713600000,
-            reading: 1500
+            reading: 1500,
             // No billingPeriod fields
           },
           {
             id: '2',
             timestamp: 1718121600000,
-            reading: 1400
-          }
+            reading: 1400,
+          },
         ],
-        saveToLocalStorage: vi.fn()
+        saveToLocalStorage: vi.fn(),
       }
 
       migrateHistoryOnStartup(mockStore)
@@ -296,10 +296,10 @@ describe('migrate-history.js', () => {
 
       // Should log migration messages
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Migrating 2 history records')
+        expect.stringContaining('[Migration] Migrating 2 history records'),
       )
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Migration completed successfully')
+        expect.stringContaining('[Migration] Migration completed successfully'),
       )
 
       consoleSpy.mockRestore()
@@ -314,10 +314,10 @@ describe('migrate-history.js', () => {
             id: '1',
             timestamp: 1720713600000,
             billingPeriodStart: '2024-07-01',
-            billingPeriodEnd: '2024-07-31'
-          }
+            billingPeriodEnd: '2024-07-31',
+          },
         ],
-        saveToLocalStorage: vi.fn()
+        saveToLocalStorage: vi.fn(),
       }
 
       migrateHistoryOnStartup(mockStore)
@@ -327,7 +327,7 @@ describe('migrate-history.js', () => {
 
       // Should log skip message
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] No legacy records found')
+        expect.stringContaining('[Migration] No legacy records found'),
       )
 
       consoleSpy.mockRestore()
@@ -338,14 +338,14 @@ describe('migrate-history.js', () => {
 
       const mockStore = {
         records: [],
-        saveToLocalStorage: vi.fn()
+        saveToLocalStorage: vi.fn(),
       }
 
       migrateHistoryOnStartup(mockStore)
 
       expect(mockStore.saveToLocalStorage).not.toHaveBeenCalled()
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] No legacy records found')
+        expect.stringContaining('[Migration] No legacy records found'),
       )
 
       consoleSpy.mockRestore()
@@ -357,7 +357,7 @@ describe('migrate-history.js', () => {
       migrateHistoryOnStartup(null)
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Invalid history store')
+        expect.stringContaining('[Migration] Invalid history store'),
       )
 
       consoleSpy.mockRestore()
@@ -369,7 +369,7 @@ describe('migrate-history.js', () => {
       migrateHistoryOnStartup(undefined)
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Invalid history store')
+        expect.stringContaining('[Migration] Invalid history store'),
       )
 
       consoleSpy.mockRestore()
@@ -379,14 +379,14 @@ describe('migrate-history.js', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       const mockStore = {
-        saveToLocalStorage: vi.fn()
+        saveToLocalStorage: vi.fn(),
         // No records property
       }
 
       migrateHistoryOnStartup(mockStore)
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] Invalid history store')
+        expect.stringContaining('[Migration] Invalid history store'),
       )
 
       consoleSpy.mockRestore()
@@ -400,12 +400,12 @@ describe('migrate-history.js', () => {
         records: [
           {
             id: '1',
-            timestamp: 1720713600000
-          }
+            timestamp: 1720713600000,
+          },
         ],
         saveToLocalStorage: vi.fn(() => {
           throw new Error('LocalStorage error')
-        })
+        }),
       }
 
       // Should not throw
@@ -415,10 +415,10 @@ describe('migrate-history.js', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('[Migration] Migration failed'),
-        expect.any(Error)
+        expect.any(Error),
       )
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[Migration] App will continue with unmigrated data')
+        expect.stringContaining('[Migration] App will continue with unmigrated data'),
       )
 
       consoleErrorSpy.mockRestore()
@@ -432,9 +432,9 @@ describe('migrate-history.js', () => {
         records: [
           {
             id: '1',
-            timestamp: 1720713600000
-          }
-        ]
+            timestamp: 1720713600000,
+          },
+        ],
         // No saveToLocalStorage method
       }
 

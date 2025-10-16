@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2025-10-09
 
 ## Active Technologies
+- JavaScript ES6+ (Vue 3.5+ Composition API) + Vue 3.5+, Pinia 2.2+, ECharts 5.x, Tailwind CSS 3.4+ (004-refactor-parameters-charts)
+- LocalStorage (for historical records and user preferences) (004-refactor-parameters-charts)
 
 - JavaScript ES6+ (Modern browser-compatible, no transpilation required for deployment) (001-build-an-application)
 - JavaScript ES6+ / Vue 3.5+ (001-build-an-application)
@@ -24,6 +26,7 @@ npm test [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNO
 JavaScript ES6+ (Modern browser-compatible, no transpilation required for deployment): Follow standard conventions
 
 ## Recent Changes
+- 004-refactor-parameters-charts: Added JavaScript ES6+ (Vue 3.5+ Composition API) + Vue 3.5+, Pinia 2.2+, ECharts 5.x, Tailwind CSS 3.4+
 
 - 001-build-an-application: Added JavaScript ES6+ / Vue 3.5+
 - 001-build-an-application: Added JavaScript ES6+ (Modern browser-compatible, no transpilation required for deployment)

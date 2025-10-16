@@ -1,6 +1,9 @@
 <template>
   <ErrorBoundary>
-    <div id="app" class="min-h-screen bg-background">
+    <div
+      id="app"
+      class="min-h-screen bg-background"
+    >
       <!-- Offline Notice -->
       <OfflineNotice :show="uiStore.isOffline" />
 
@@ -8,7 +11,7 @@
       <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <header class="mb-8 sm:mb-12">
           <h1 class="govuk-heading-xl text-center">
-            💧智慧農業水資源管理平台
+            💧 水資源查詢與估算平台
           </h1>
           <p class="govuk-body-l text-center text-text-secondary">
             以電推水 - 農業用水量估算工具
@@ -38,22 +41,24 @@
         <section class="mb-8 sm:mb-10">
           <CalculatorForm
             v-model="formData"
+            v-model:pump-params="pumpParams"
             :disabled="uiStore.isOffline || uiStore.isLoading"
             @submit="handleCalculate"
           />
         </section>
 
-        <!-- Advanced Parameters -->
+        <!-- Advanced Parameters (now just help section) -->
         <section class="mb-8 sm:mb-10">
           <AdvancedParams
-            v-model="pumpParams"
             v-model:show="uiStore.showAdvancedParams"
-            @reset="handleResetPumpParams"
           />
         </section>
 
         <!-- Results -->
-        <section v-if="calculationStore.hasCalculated" class="mb-8 sm:mb-10">
+        <section
+          v-if="calculationStore.hasCalculated"
+          class="mb-8 sm:mb-10"
+        >
           <ResultCard
             :water-flow-rate="calculationStore.waterFlowRate"
             :monthly-volume="calculationStore.monthlyVolume"
@@ -78,7 +83,10 @@
         </section>
 
         <!-- Dashboard Charts -->
-        <section v-if="historyStore.recordCount > 0" class="mb-8 sm:mb-10">
+        <section
+          v-if="historyStore.recordCount > 0"
+          class="mb-8 sm:mb-10"
+        >
           <DashboardTabs v-model:active-tab="activeTab">
             <template #seasonal>
               <SeasonalChart :records="historyStore.records" />
@@ -109,24 +117,31 @@
       <div
         v-if="showDeleteConfirm"
         class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
-        @click.self="showDeleteConfirm = false"
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-dialog-title"
+        @click.self="showDeleteConfirm = false"
       >
         <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
-          <h3 id="delete-dialog-title" class="govuk-heading-m">確認刪除</h3>
-          <p class="govuk-body">確定要刪除此紀錄嗎？此操作無法復原。</p>
+          <h3
+            id="delete-dialog-title"
+            class="govuk-heading-m"
+          >
+            確認刪除
+          </h3>
+          <p class="govuk-body">
+            確定要刪除此紀錄嗎？此操作無法復原。
+          </p>
           <div class="flex flex-col sm:flex-row justify-end gap-4 mt-6">
             <button
-              @click="showDeleteConfirm = false"
               class="btn-secondary"
+              @click="showDeleteConfirm = false"
             >
               取消
             </button>
             <button
-              @click="confirmDelete"
               class="btn-warning"
+              @click="confirmDelete"
             >
               確定刪除
             </button>
@@ -138,26 +153,31 @@
       <div
         v-if="showClearAllConfirm"
         class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
-        @click.self="showClearAllConfirm = false"
         role="dialog"
         aria-modal="true"
         aria-labelledby="clear-all-dialog-title"
+        @click.self="showClearAllConfirm = false"
       >
         <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
-          <h3 id="clear-all-dialog-title" class="govuk-heading-m">確認清除全部</h3>
+          <h3
+            id="clear-all-dialog-title"
+            class="govuk-heading-m"
+          >
+            確認清除全部
+          </h3>
           <p class="govuk-body">
             確定要清除所有歷史紀錄嗎？此操作無法復原。
           </p>
           <div class="flex flex-col sm:flex-row justify-end gap-4 mt-6">
             <button
-              @click="showClearAllConfirm = false"
               class="btn-secondary"
+              @click="showClearAllConfirm = false"
             >
               取消
             </button>
             <button
-              @click="confirmClearAll"
               class="btn-warning"
+              @click="confirmClearAll"
             >
               確定清除
             </button>
@@ -169,91 +189,91 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineAsyncComponent } from "vue";
-import { useCalculationStore } from "@/stores/calculation";
-import { useHistoryStore } from "@/stores/history";
-import { useUiStore } from "@/stores/ui";
-import { calculateStats } from "@/utils/chartHelpers";
-import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
-import OfflineNotice from "@/components/common/OfflineNotice.vue";
-import ErrorMessage from "@/components/common/ErrorMessage.vue";
-import CalculatorForm from "@/components/calculator/CalculatorForm.vue";
-import AdvancedParams from "@/components/calculator/AdvancedParams.vue";
-import ResultCard from "@/components/calculator/ResultCard.vue";
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
+import { useCalculationStore } from '@/stores/calculation'
+import { useHistoryStore } from '@/stores/history'
+import { useUiStore } from '@/stores/ui'
+import { calculateStats } from '@/utils/chartHelpers'
+import ErrorBoundary from '@/components/common/ErrorBoundary.vue'
+import OfflineNotice from '@/components/common/OfflineNotice.vue'
+import ErrorMessage from '@/components/common/ErrorMessage.vue'
+import CalculatorForm from '@/components/calculator/CalculatorForm.vue'
+import AdvancedParams from '@/components/calculator/AdvancedParams.vue'
+import ResultCard from '@/components/calculator/ResultCard.vue'
 
 // Lazy load heavy components
 const HistoryTable = defineAsyncComponent(
-  () => import("@/components/history/HistoryTable.vue")
-);
+  () => import('@/components/history/HistoryTable.vue'),
+)
 const RecordCard = defineAsyncComponent(
-  () => import("@/components/history/RecordCard.vue")
-);
+  () => import('@/components/history/RecordCard.vue'),
+)
 const DashboardTabs = defineAsyncComponent(
-  () => import("@/components/dashboard/DashboardTabs.vue")
-);
+  () => import('@/components/dashboard/DashboardTabs.vue'),
+)
 const DashboardStats = defineAsyncComponent(
-  () => import("@/components/dashboard/DashboardStats.vue")
-);
+  () => import('@/components/dashboard/DashboardStats.vue'),
+)
 const SeasonalChart = defineAsyncComponent(
-  () => import("@/components/charts/SeasonalChart.vue")
-);
+  () => import('@/components/charts/SeasonalChart.vue'),
+)
 const CropComparisonChart = defineAsyncComponent(
-  () => import("@/components/charts/CropComparisonChart.vue")
-);
+  () => import('@/components/charts/CropComparisonChart.vue'),
+)
 const AnnualTrendChart = defineAsyncComponent(
-  () => import("@/components/charts/AnnualTrendChart.vue")
-);
+  () => import('@/components/charts/AnnualTrendChart.vue'),
+)
 
 // Stores
-const calculationStore = useCalculationStore();
-const historyStore = useHistoryStore();
-const uiStore = useUiStore();
+const calculationStore = useCalculationStore()
+const historyStore = useHistoryStore()
+const uiStore = useUiStore()
 
 // State
-const formData = ref({});
+const formData = ref({})
 const pumpParams = ref({
   horsepower: 5.0,
   efficiency: 0.75,
   wellDepth: 20.0,
-});
+})
 
 // History state
-const showRecordCard = ref(false);
-const selectedRecord = ref(null);
-const recordEditMode = ref(false);
-const showDeleteConfirm = ref(false);
-const showClearAllConfirm = ref(false);
-const recordToDelete = ref(null);
+const showRecordCard = ref(false)
+const selectedRecord = ref(null)
+const recordEditMode = ref(false)
+const showDeleteConfirm = ref(false)
+const showClearAllConfirm = ref(false)
+const recordToDelete = ref(null)
 
 // Dashboard state
-const activeTab = ref("seasonal");
+const activeTab = ref('annual')  // User Story 004: Changed default from "seasonal" to "annual"
 
 // Computed
 const dashboardStats = computed(() => {
-  return calculateStats(historyStore.records);
-});
+  return calculateStats(historyStore.records)
+})
 
 // Methods
 const handleCalculate = async (data) => {
   try {
-    uiStore.setLoading(true);
+    uiStore.setLoading(true)
 
     // Fetch Taipower pricing (with automatic fallback)
-    await calculationStore.fetchTaipowerPricing();
+    await calculationStore.fetchTaipowerPricing()
 
     // Update form data in store
-    calculationStore.setFormData(data);
+    calculationStore.setFormData(data)
 
     // Update pump params
-    calculationStore.setPumpParams(pumpParams.value);
+    calculationStore.setPumpParams(pumpParams.value)
 
-    uiStore.setSuccess("計算完成");
+    uiStore.setSuccess('計算完成')
   } catch (error) {
-    uiStore.setError(error.message || "計算失敗，請稍後再試");
+    uiStore.setError(error.message || '計算失敗，請稍後再試')
   } finally {
-    uiStore.setLoading(false);
+    uiStore.setLoading(false)
   }
-};
+}
 
 const handleSaveRecord = () => {
   try {
@@ -272,130 +292,121 @@ const handleSaveRecord = () => {
       monthlyVolume: calculationStore.monthlyVolume,
       billingPeriodStart: calculationStore.billingPeriodStart,
       billingPeriodEnd: calculationStore.billingPeriodEnd,
-    };
+    }
 
-    historyStore.addRecord(recordData);
-    uiStore.setSuccess("紀錄已儲存");
+    historyStore.addRecord(recordData)
+    uiStore.setSuccess('紀錄已儲存')
   } catch (error) {
-    uiStore.setError(error.message || "儲存失敗");
+    uiStore.setError(error.message || '儲存失敗')
   }
-};
+}
 
 const handleShare = () => {
   // Share functionality
   const shareData = {
-    title: "農業用水量估算結果",
+    title: '農業用水量估算結果',
     text: `推算用電: ${calculationStore.calculatedKwh.toFixed(1)} kWh\n每分鐘抽水量: ${calculationStore.waterFlowRate.toFixed(2)} L/s\n每月用水量: ${calculationStore.monthlyVolume.toFixed(2)} m³`,
-  };
+  }
 
   if (navigator.share) {
     navigator.share(shareData).catch(() => {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(shareData.text);
-      uiStore.setSuccess("結果已複製到剪貼簿");
-    });
+      navigator.clipboard.writeText(shareData.text)
+      uiStore.setSuccess('結果已複製到剪貼簿')
+    })
   } else {
-    navigator.clipboard.writeText(shareData.text);
-    uiStore.setSuccess("結果已複製到剪貼簿");
+    navigator.clipboard.writeText(shareData.text)
+    uiStore.setSuccess('結果已複製到剪貼簿')
   }
-};
-
-const handleResetPumpParams = () => {
-  pumpParams.value = {
-    horsepower: 5.0,
-    efficiency: 0.75,
-    wellDepth: 20.0,
-  };
-  calculationStore.setPumpParams(pumpParams.value);
-};
+}
 
 // History methods
 const handleViewRecord = (record) => {
-  selectedRecord.value = record;
-  recordEditMode.value = false;
-  showRecordCard.value = true;
-};
+  selectedRecord.value = record
+  recordEditMode.value = false
+  showRecordCard.value = true
+}
 
 const handleEditRecord = (record) => {
-  selectedRecord.value = record;
-  recordEditMode.value = true;
-  showRecordCard.value = true;
-};
+  selectedRecord.value = record
+  recordEditMode.value = true
+  showRecordCard.value = true
+}
 
 const handleDeleteRecord = (recordId) => {
-  recordToDelete.value = recordId;
-  showDeleteConfirm.value = true;
-};
+  recordToDelete.value = recordId
+  showDeleteConfirm.value = true
+}
 
 const confirmDelete = () => {
   try {
-    historyStore.deleteRecord(recordToDelete.value);
-    uiStore.setSuccess("紀錄已刪除");
+    historyStore.deleteRecord(recordToDelete.value)
+    uiStore.setSuccess('紀錄已刪除')
   } catch (error) {
-    uiStore.setError(error.message || "刪除失敗");
+    uiStore.setError(error.message || '刪除失敗')
   } finally {
-    showDeleteConfirm.value = false;
-    recordToDelete.value = null;
+    showDeleteConfirm.value = false
+    recordToDelete.value = null
   }
-};
+}
 
 const handleClearAllRecords = () => {
-  showClearAllConfirm.value = true;
-};
+  showClearAllConfirm.value = true
+}
 
 const confirmClearAll = () => {
   try {
-    historyStore.clearAllRecords();
-    uiStore.setSuccess("所有紀錄已清除");
+    historyStore.clearAllRecords()
+    uiStore.setSuccess('所有紀錄已清除')
   } catch (error) {
-    uiStore.setError(error.message || "清除失敗");
+    uiStore.setError(error.message || '清除失敗')
   } finally {
-    showClearAllConfirm.value = false;
+    showClearAllConfirm.value = false
   }
-};
+}
 
 const handleCloseRecordCard = () => {
-  showRecordCard.value = false;
-  selectedRecord.value = null;
-  recordEditMode.value = false;
-};
+  showRecordCard.value = false
+  selectedRecord.value = null
+  recordEditMode.value = false
+}
 
 const handleSaveRecordEdit = (updatedRecord) => {
   try {
-    historyStore.updateRecord(updatedRecord.id, updatedRecord);
-    uiStore.setSuccess("紀錄已更新");
-    handleCloseRecordCard();
+    historyStore.updateRecord(updatedRecord.id, updatedRecord)
+    uiStore.setSuccess('紀錄已更新')
+    handleCloseRecordCard()
   } catch (error) {
-    uiStore.setError(error.message || "更新失敗");
+    uiStore.setError(error.message || '更新失敗')
   }
-};
+}
 
 const handleExport = (format) => {
   try {
-    if (format === "csv") {
-      historyStore.downloadCSV();
-      uiStore.setSuccess("CSV 檔案已下載");
-    } else if (format === "json") {
-      historyStore.downloadJSON();
-      uiStore.setSuccess("JSON 檔案已下載");
+    if (format === 'csv') {
+      historyStore.downloadCSV()
+      uiStore.setSuccess('CSV 檔案已下載')
+    } else if (format === 'json') {
+      historyStore.downloadJSON()
+      uiStore.setSuccess('JSON 檔案已下載')
     }
   } catch (error) {
-    uiStore.setError(error.message || "匯出失敗");
+    uiStore.setError(error.message || '匯出失敗')
   }
-};
+}
 
 // Lifecycle
 onMounted(async () => {
   try {
     // Check online status
-    uiStore.checkOnlineStatus();
+    uiStore.checkOnlineStatus()
 
     // Try to fetch Taipower pricing (non-blocking)
     calculationStore.fetchTaipowerPricing().catch(() => {
       // Silently fail - will use fallback calculation
-    });
+    })
   } catch (error) {
-    console.error("Initialization error:", error);
+    console.error('Initialization error:', error)
   }
-});
+})
 </script>

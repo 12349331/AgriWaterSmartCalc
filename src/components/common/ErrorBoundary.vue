@@ -17,12 +17,17 @@
           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
         />
       </svg>
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">糟糕！發生錯誤</h2>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">
+        糟糕！發生錯誤
+      </h2>
       <p class="text-gray-600 mb-6">
         應用程式遇到了意外錯誤，請嘗試重新整理頁面。
       </p>
 
-      <details v-if="errorDetails" class="mb-6 text-left">
+      <details
+        v-if="errorDetails"
+        class="mb-6 text-left"
+      >
         <summary
           class="cursor-pointer text-sm text-gray-500 hover:text-gray-700"
         >
@@ -34,50 +39,57 @@
       </details>
 
       <div class="space-y-3">
-        <button @click="reload" class="w-full btn-primary">重新整理頁面</button>
         <button
-          @click="clearAndReload"
+          class="w-full btn-primary"
+          @click="reload"
+        >
+          重新整理頁面
+        </button>
+        <button
           class="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          @click="clearAndReload"
         >
           清除資料並重新整理
         </button>
       </div>
 
-      <p class="mt-6 text-xs text-gray-500">若問題持續發生，請聯繫技術支援</p>
+      <p class="mt-6 text-xs text-gray-500">
+        若問題持續發生，請聯繫技術支援
+      </p>
     </div>
   </div>
   <slot v-else />
 </template>
 
 <script setup>
-import { ref, onErrorCaptured } from "vue";
+import { ref, onErrorCaptured } from 'vue'
 
-const hasError = ref(false);
-const errorDetails = ref("");
+const hasError = ref(false)
+const errorDetails = ref('')
 
 onErrorCaptured((err, instance, info) => {
-  hasError.value = true;
-  errorDetails.value = `Error: ${err.message}\nInfo: ${info}\nStack: ${err.stack}`;
+  hasError.value = true
+  errorDetails.value = `Error: ${err.message}\nInfo: ${info}\nStack: ${err.stack}`
 
   // Log to console for debugging
-  console.error("Error boundary caught:", err, instance, info);
+  console.error('Error boundary caught:', err, instance, info)
 
   // Prevent error from propagating
-  return false;
-});
+  return false
+})
 
 function reload() {
-  window.location.reload();
+  window.location.reload()
 }
 
 function clearAndReload() {
   // Clear localStorage
-  localStorage.clear();
+  localStorage.clear()
 
   // Clear sessionStorage
-  sessionStorage.clear();
+  sessionStorage.clear()
 
   // Reload
-  window.location.reload();
+  window.location.reload()
 }
 </script>

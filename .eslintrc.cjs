@@ -47,8 +47,14 @@ module.exports = {
   overrides: [
     {
       files: ['**/*.test.js', '**/*.spec.js', 'tests/**'],
-      env: {
-        vitest: true,
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        vi: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
       },
       rules: {
         'no-console': 'off', // Allow console in tests

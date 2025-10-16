@@ -1,6 +1,6 @@
 // Water calculation formulas based on spec.md
 
-import { CALCULATION_PARAMS } from "@/config/constants";
+import { CALCULATION_PARAMS } from '@/config/constants'
 
 /**
  * Calculate water flow rate (Q) using pump specifications
@@ -12,13 +12,13 @@ import { CALCULATION_PARAMS } from "@/config/constants";
  * @returns {number} Water flow rate in L/s
  */
 export function calculateWaterFlowRate(horsepower, efficiency, wellDepth) {
-  if (!horsepower || !efficiency || !wellDepth) return 0;
+  if (!horsepower || !efficiency || !wellDepth) return 0
 
-  const { gravityConstant, safetyFactor } = CALCULATION_PARAMS;
+  const { gravityConstant, safetyFactor } = CALCULATION_PARAMS
 
   return (
     (horsepower * efficiency) / (gravityConstant * wellDepth * safetyFactor)
-  );
+  )
 }
 
 /**
@@ -32,14 +32,14 @@ export function calculateWaterFlowRate(horsepower, efficiency, wellDepth) {
  * @returns {number} Monthly water volume in m³
  */
 export function calculateMonthlyVolume(flowRate, kwh, horsepower, fieldArea) {
-  if (!flowRate || !kwh || !horsepower || !fieldArea) return 0;
+  if (!flowRate || !kwh || !horsepower || !fieldArea) return 0
 
-  const { minutesPerHour, hoursPerKwhDivisor } = CALCULATION_PARAMS;
+  const { minutesPerHour, hoursPerKwhDivisor } = CALCULATION_PARAMS
 
   return (
     (flowRate * minutesPerHour * kwh) /
     (hoursPerKwhDivisor * horsepower * fieldArea)
-  );
+  )
 }
 
 /**
@@ -50,7 +50,7 @@ export function calculateMonthlyVolume(flowRate, kwh, horsepower, fieldArea) {
  * @returns {number} Area in fen
  */
 export function hectaresToFen(hectares) {
-  return hectares / 0.0969;
+  return hectares / 0.0969
 }
 
 /**
@@ -60,7 +60,7 @@ export function hectaresToFen(hectares) {
  * @returns {number} Area in hectares
  */
 export function fenToHectares(fen) {
-  return fen * 0.0969;
+  return fen * 0.0969
 }
 
 /**
@@ -70,5 +70,5 @@ export function fenToHectares(fen) {
  * @returns {boolean} True if over extraction
  */
 export function isOverExtraction(volume) {
-  return volume > CALCULATION_PARAMS.overExtractionThreshold;
+  return volume > CALCULATION_PARAMS.overExtractionThreshold
 }

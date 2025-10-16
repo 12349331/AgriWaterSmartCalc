@@ -39,7 +39,7 @@ export function ensureTaiwanTimezone(date) {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false
+    hour12: false,
   })
 
   // 解析台灣時間字串（格式: YYYY/MM/DD HH:mm:ss）

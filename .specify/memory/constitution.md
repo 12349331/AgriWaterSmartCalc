@@ -1,159 +1,173 @@
 <!--
-Sync Impact Report
-==================
-Version change: [Initial template] → 1.0.0
-Change type: MINOR - Initial constitution establishment with 4 core principles
-Added sections: All sections (initial creation)
-Modified principles: N/A (new constitution)
-Removed sections: N/A
+Sync Impact Report (Constitution Update)
+════════════════════════════════════════════════════════════════════════════════
+Version Change: Template → 1.0.0
+Change Type: MINOR (Initial constitution establishment)
 
-Templates reviewed:
-✅ plan-template.md - Constitution Check section aligns with principles
-✅ spec-template.md - User scenarios and requirements align with UX/quality principles
-✅ tasks-template.md - Testing phases align with testing standards principle
-✅ All templates consistent with constitution requirements
+Modified Principles:
+- ✅ Created: I. User-Centric Design & Accessibility
+- ✅ Created: II. Test-Driven Development (NON-NEGOTIABLE)
+- ✅ Created: III. Component Modularity & Reusability
+- ✅ Created: IV. Data Integrity & Migration Safety
+- ✅ Created: V. Progressive Enhancement
 
-Follow-up TODOs: None
+Added Sections:
+- ✅ Technology Standards
+- ✅ Quality Assurance
+- ✅ Governance
+
+Templates Status:
+- ✅ spec-template.md: Aligned (user stories match accessibility principle)
+- ✅ plan-template.md: Aligned (constitution check gate present)
+- ✅ tasks-template.md: Aligned (test-first workflow enforced)
+- ✅ CLAUDE.md: Aligned (Vue 3.5+, testing commands documented)
+
+Follow-up TODOs:
+- None - all placeholders filled
+
+Rationale for Version 1.0.0:
+- First formal constitution for AquaMetrics project
+- Establishes governance framework for agricultural water estimation system
+- Based on project characteristics: Vue 3.5+, TDD, 90%+ test coverage, GOV.UK accessibility
+════════════════════════════════════════════════════════════════════════════════
 -->
 
-# Forest Focus Constitution
+# AquaMetrics Constitution
 
 ## Core Principles
 
-### I. Code Quality First
+### I. User-Centric Design & Accessibility
 
-All code MUST meet professional quality standards before merging:
+Every feature MUST prioritize elderly farmer users and accessibility:
+- Font sizes MUST be at least 19px (GOV.UK body standard)
+- Touch targets MUST be minimum 44×44px (WCAG 2.1 AA)
+- Color contrast MUST meet WCAG 2.1 AA (≥4.5:1 for normal text)
+- Forms MUST have clear labels, hints, and error messages
+- All interactive elements MUST support keyboard navigation with visible focus indicators
+- ARIA attributes MUST be correctly implemented for screen reader support
 
-- **Readability**: Code must be self-documenting with clear naming conventions and logical
-  organization. Complex logic requires explanatory comments.
-- **Maintainability**: Follow DRY (Don't Repeat Yourself) and SOLID principles. Extract
-  reusable logic into well-defined functions/modules.
-- **Type Safety**: Leverage static typing where available. All public interfaces must have
-  explicit type declarations.
-- **Error Handling**: All error cases must be explicitly handled. No silent failures. Error
-  messages must be actionable and user-friendly.
-- **Code Review**: All changes require peer review before merging. Reviewers must verify
-  adherence to these standards.
+**Rationale**: The target users (elderly farmers) require larger fonts, clear visual hierarchy, and assistive technology support. This is a legal and ethical requirement, not an optional enhancement.
 
-**Rationale**: High code quality reduces bugs, accelerates feature development, and lowers
-maintenance costs. Technical debt compounds exponentially; preventing it is cheaper than
-fixing it.
+### II. Test-Driven Development (NON-NEGOTIABLE)
 
-### II. Testing Standards (NON-NEGOTIABLE)
+TDD is MANDATORY for all feature development:
+- Tests MUST be written BEFORE implementation
+- Tests MUST fail initially, then pass after implementation (Red-Green-Refactor)
+- Test coverage MUST remain ≥90% for the entire codebase
+- Each user story MUST have independent acceptance tests
+- All commits to main MUST pass the full test suite
 
-Comprehensive testing is mandatory for all features:
+**Test Categories Required**:
+- Unit tests for utilities and composables
+- Component tests for Vue components
+- Integration tests for stores and data flow
+- E2E tests for critical user journeys
 
-- **Test-First Development**: Write tests before implementation. Tests must fail initially,
-  then pass after correct implementation (Red-Green-Refactor cycle).
-- **Coverage Requirements**:
-  - Unit tests: All business logic, edge cases, and error paths
-  - Integration tests: All API contracts, data flows, and service interactions
-  - End-to-end tests: All critical user journeys
-- **Test Quality**: Tests must be deterministic, isolated, fast, and maintainable. No flaky
-  tests allowed.
-- **Continuous Testing**: All tests must pass in CI/CD before merge. No exceptions.
-- **Test Documentation**: Complex test scenarios require clear explanations of what is being
-  tested and why.
+**Rationale**: With 90%+ test coverage already achieved, regression prevention is critical. The agricultural calculation accuracy directly impacts farmer decisions—untested code is unacceptable.
 
-**Rationale**: Tests are executable specifications that prevent regressions, enable safe
-refactoring, and document system behavior. Skipping tests creates undetectable instability
-and erodes confidence in deployments.
+### III. Component Modularity & Reusability
 
-### III. User Experience Consistency
+All UI components MUST follow Vue 3.5+ Composition API patterns:
+- Components MUST be self-contained with clear props/emits contracts
+- Shared logic MUST be extracted to composables (e.g., `useValidation`, `useBillingPeriod`)
+- Components MUST be independently testable without parent dependencies
+- State management MUST use Pinia stores for cross-component state
+- No component SHALL exceed 400 lines; split complex components into sub-components
 
-User-facing features must deliver intuitive, consistent, and accessible experiences:
+**Rationale**: Modularity enables parallel development, easier testing, and feature reusability across the growing application.
 
-- **Design System Compliance**: All UI components must follow established design patterns,
-  spacing, typography, and color schemes.
-- **Responsive Design**: Interfaces must adapt gracefully across device sizes and
-  orientations. Test on mobile, tablet, and desktop viewports.
-- **Accessibility (a11y)**: WCAG 2.1 Level AA compliance required. Keyboard navigation,
-  screen reader support, and sufficient color contrast mandatory.
-- **Error States**: User-facing errors must provide clear explanations and actionable next
-  steps. No technical jargon or stack traces shown to end users.
-- **Loading States**: All asynchronous operations require loading indicators. Users must
-  always know when the system is processing.
-- **Interaction Feedback**: Provide immediate visual/haptic feedback for all user actions
-  (button presses, form submissions, etc.).
+### IV. Data Integrity & Migration Safety
 
-**Rationale**: Consistent UX reduces cognitive load, builds user trust, and minimizes
-support requests. Accessibility is both a legal requirement and moral imperative.
+All data operations MUST preserve user information:
+- Schema changes MUST include automatic migration logic
+- Migrations MUST be backward compatible and non-destructive
+- Fallback strategies MUST handle migration errors gracefully
+- Historical records MUST maintain temporal accuracy (billing period vs. creation time)
+- All timestamps MUST enforce Taiwan timezone (GMT+8)
 
-### IV. Performance Requirements
+**Critical Entities**:
+- Calculation history records (with dual timestamps)
+- User input validation state
+- Taipower pricing data cache
 
-Performance is a feature, not an afterthought:
+**Rationale**: Farmers rely on historical data for planning. Data loss or corruption undermines trust and violates the core value proposition.
 
-- **Response Time Targets**:
-  - API endpoints: <200ms p95 latency
-  - Page loads: <2s initial load, <1s navigation
-  - UI interactions: <100ms perceived response time
-- **Resource Efficiency**:
-  - Client bundle size: <500KB initial (gzipped)
-  - Memory usage: No memory leaks, bounded growth
-  - Database queries: N+1 queries prohibited, indexes required for all lookups
-- **Scalability**: Design for 10x current load. Horizontal scaling must be possible without
-  architectural changes.
-- **Monitoring**: All performance-critical paths must be instrumented with metrics, tracing,
-  and alerting.
-- **Performance Testing**: Load tests required for API changes. Performance regression tests
-  in CI/CD.
+### V. Progressive Enhancement & Performance
 
-**Rationale**: Poor performance directly impacts user satisfaction, conversion rates, and
-operational costs. Performance problems are harder to fix post-launch than during
-development.
+Features MUST work in degraded conditions:
+- Core calculation MUST work offline with fallback pricing data
+- Application MUST function on low-end mobile devices
+- JavaScript bundle size MUST remain <250KB (gzipped)
+- Time to Interactive (TTI) MUST be <3 seconds on 3G networks
+- Lazy loading MUST be used for non-critical components (charts, history table)
 
-## Development Workflow
+**Rationale**: Rural farmers may have poor network connectivity and older devices. The tool must be universally accessible regardless of infrastructure limitations.
 
-### Code Review Process
+## Technology Standards
 
-1. **Self-Review**: Author reviews own changes before requesting review
-2. **Automated Checks**: Linting, type checking, and all tests must pass
-3. **Peer Review**: At least one approval from team member required
-4. **Constitution Compliance**: Reviewer must verify alignment with all four principles
-5. **Merge**: Only after all checks pass and approval granted
+### Primary Stack (LOCKED)
+- **Frontend Framework**: Vue 3.5+ (Composition API only)
+- **State Management**: Pinia 2.2+
+- **Build Tool**: Vite 5.0+
+- **Styling**: Tailwind CSS 3.4+ with GOV.UK Design System principles
+- **Testing**: Vitest (unit/component) + Playwright (E2E)
+- **Language**: JavaScript ES6+ (no TypeScript for simplicity)
 
-### Quality Gates
+### Design System
+- GOV.UK Design System principles MUST guide all UI decisions
+- Color palette MUST use GOV.UK colors (#1d70b8 primary, #0b0c0c text)
+- Typography MUST follow GOV.UK scale (19px body, 24px/36px/48px headings)
+- Spacing MUST use GOV.UK increments (15px, 20px, 25px, 30px, 40px, 50px)
 
-Features cannot proceed to next phase until:
+**Rationale**: Locked to prevent scope creep and maintain focus on agricultural domain features.
 
-- **Specification**: User stories defined, acceptance criteria clear, edge cases documented
-- **Design**: Architecture reviewed, performance implications assessed, UX mockups approved
-- **Implementation**: Code reviewed, tests passing, no known bugs
-- **Pre-Release**: Performance validated, accessibility verified, documentation complete
+## Quality Assurance
 
-### Documentation Requirements
+### Definition of Done
+A feature is COMPLETE only when:
+1. ✅ All user stories have passing acceptance tests
+2. ✅ Test coverage ≥90% for new code
+3. ✅ ESLint passes with zero warnings
+4. ✅ All E2E tests pass in CI
+5. ✅ Accessibility audit passes (contrast, ARIA, keyboard nav)
+6. ✅ Works offline with fallback data
+7. ✅ Mobile responsive (tested on 320px and 768px viewports)
+8. ✅ Documentation updated (if applicable)
 
-- **Code Documentation**: Public APIs documented with usage examples
-- **User Documentation**: Feature guides for end-user-facing changes
-- **Architecture Documentation**: Design decisions and tradeoffs recorded
-- **Runbooks**: Operational procedures for deployment, monitoring, and incident response
+### Code Review Requirements
+All PRs MUST:
+- Include test evidence (screenshots of passing tests)
+- Demonstrate accessibility compliance
+- Show mobile responsive behavior
+- Document any migration logic or data model changes
+- Pass automated CI checks before review request
 
 ## Governance
 
-### Constitution Authority
-
-This constitution supersedes all other development practices. When conflicts arise between
-this constitution and other guidelines, the constitution takes precedence.
-
 ### Amendment Process
-
-1. **Proposal**: Document proposed change with rationale and impact analysis
-2. **Review**: Team discussion and feedback period (minimum 1 week)
-3. **Approval**: Requires consensus from core team members
-4. **Migration**: Update all affected templates, documentation, and tooling
-5. **Communication**: Announce changes to all stakeholders
+Constitution amendments require:
+1. Proposal documenting the change and rationale
+2. Review of impact on existing features
+3. Update of dependent templates (spec, plan, tasks)
+4. Version bump following semantic versioning:
+   - **MAJOR**: Breaking principle removals or redefinitions
+   - **MINOR**: New principles or substantial expansions
+   - **PATCH**: Clarifications, wording fixes
 
 ### Versioning Policy
+- Constitution version MUST follow semantic versioning (MAJOR.MINOR.PATCH)
+- All specs MUST reference constitution version used
+- Breaking changes MUST include migration guide
 
-- **MAJOR**: Backward-incompatible principle removals or fundamental redefinitions
-- **MINOR**: New principles added or material expansions to existing principles
-- **PATCH**: Clarifications, wording improvements, or non-semantic refinements
+### Compliance Verification
+- All feature specs MUST pass constitution check gate (in plan.md)
+- Quarterly compliance audits MUST be conducted
+- Violations MUST be documented in complexity tracking table with justification
 
-### Compliance Review
+### Runtime Guidance
+For AI-assisted development, refer to `CLAUDE.md` for:
+- Active technology commands
+- Project-specific code style
+- Language preferences (Traditional Chinese for docs, English for code)
 
-- **Pull Requests**: Every PR must include constitutional compliance checklist
-- **Quarterly Audits**: Review codebase adherence to principles, identify drift
-- **Retrospectives**: Discuss constitutional effectiveness, propose amendments if needed
-- **Violations**: Must be justified in Complexity Tracking section of implementation plans
-
-**Version**: 1.0.0 | **Ratified**: 2025-10-08 | **Last Amended**: 2025-10-08
+**Version**: 1.0.0 | **Ratified**: 2025-01-16 | **Last Amended**: 2025-01-16

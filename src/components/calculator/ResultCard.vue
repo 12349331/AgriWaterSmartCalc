@@ -3,19 +3,31 @@
     class="result-card"
     :class="{ 'border-2 border-warning': isOverExtraction }"
   >
-    <h2 class="text-xl font-semibold mb-4">計算結果</h2>
+    <h2 class="text-xl font-semibold mb-4">
+      計算結果
+    </h2>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center py-8">
+    <div
+      v-if="loading"
+      class="text-center py-8"
+    >
       <LoadingSpinner size="md" />
-      <p class="text-gray-600 mt-2">計算中...</p>
+      <p class="text-gray-600 mt-2">
+        計算中...
+      </p>
     </div>
 
     <!-- Results -->
-    <div v-else class="space-y-4">
+    <div
+      v-else
+      class="space-y-4"
+    >
       <!-- Calculated kWh -->
       <div class="bg-blue-50 p-4 rounded-lg">
-        <div class="text-sm text-gray-600">推算用電度數</div>
+        <div class="text-sm text-gray-600">
+          推算用電度數
+        </div>
         <div class="text-2xl font-bold text-primary">
           {{ formatKwh(calculatedKwh) }}
         </div>
@@ -23,7 +35,9 @@
 
       <!-- Water Flow Rate (Q) -->
       <div class="bg-green-50 p-4 rounded-lg">
-        <div class="text-sm text-gray-600">每分鐘抽水量 (Q)</div>
+        <div class="text-sm text-gray-600">
+          每分鐘抽水量 (Q)
+        </div>
         <div class="text-2xl font-bold text-green-700">
           {{ formatFlowRate(waterFlowRate) }}
         </div>
@@ -34,7 +48,9 @@
         class="p-4 rounded-lg"
         :class="isOverExtraction ? 'bg-orange-50' : 'bg-indigo-50'"
       >
-        <div class="text-sm text-gray-600">每月用水量 (V)</div>
+        <div class="text-sm text-gray-600">
+          每月用水量 (V)
+        </div>
         <div
           class="text-2xl font-bold"
           :class="isOverExtraction ? 'text-orange-600' : 'text-indigo-700'"
@@ -91,13 +107,17 @@
 
       <!-- Action Buttons -->
       <div class="flex space-x-3 pt-2">
-        <button type="button" @click="emit('save')" class="btn-primary flex-1">
+        <button
+          type="button"
+          class="btn-primary flex-1"
+          @click="emit('save')"
+        >
           儲存紀錄
         </button>
         <button
           type="button"
-          @click="emit('share')"
           class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          @click="emit('share')"
         >
           分享
         </button>
@@ -107,8 +127,8 @@
 </template>
 
 <script setup>
-import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
-import { formatKwh, formatFlowRate, formatVolume } from "@/utils/formatters";
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { formatKwh, formatFlowRate, formatVolume } from '@/utils/formatters'
 
 defineProps({
   waterFlowRate: {
@@ -133,9 +153,9 @@ defineProps({
   },
   dataSource: {
     type: String,
-    default: "",
+    default: '',
   },
-});
+})
 
-const emit = defineEmits(["save", "share"]);
+const emit = defineEmits(['save', 'share'])
 </script>

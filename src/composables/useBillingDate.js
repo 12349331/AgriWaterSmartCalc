@@ -169,6 +169,6 @@ export function useBillingDate(initialDate = null) {
     reset,
     
     // Constants
-    MIN_ALLOWED_DATE
+    MIN_ALLOWED_DATE,
   }
 }

@@ -36,8 +36,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: null,
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -58,8 +58,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: '2024-07-31'
-        }
+          endDate: '2024-07-31',
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -83,8 +83,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: null,
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -98,8 +98,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const endInput = wrapper.find('[data-testid="end-date-input"]')
@@ -113,8 +113,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: null,
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -134,8 +134,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-15',
-          endDate: '2024-07-01' // End before start
-        }
+          endDate: '2024-07-01', // End before start
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -149,8 +149,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-15',
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const endInput = wrapper.find('[data-testid="end-date-input"]')
@@ -164,8 +164,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: '2024-07-31'
-        }
+          endDate: '2024-07-31',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -180,8 +180,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-01-01',
-          endDate: '2024-04-01' // 91 days
-        }
+          endDate: '2024-04-01', // 91 days
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -196,8 +196,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: '2024-07-31' // 31 days
-        }
+          endDate: '2024-07-31', // 31 days
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -210,8 +210,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-01-01',
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const endInput = wrapper.find('[data-testid="end-date-input"]')
@@ -228,8 +228,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-20', // Future date (current is 2024-07-15)
-          endDate: '2024-08-01'
-        }
+          endDate: '2024-08-01',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -243,8 +243,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-06-01',
-          endDate: '2024-06-30'
-        }
+          endDate: '2024-06-30',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -259,8 +259,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-05-15', // Non-summer
-          endDate: '2024-06-14'   // Summer
-        }
+          endDate: '2024-06-14',   // Summer
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -274,8 +274,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-05-15',
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       const endInput = wrapper.find('[data-testid="end-date-input"]')
@@ -289,8 +289,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: '2024-07-31' // Both in summer
-        }
+          endDate: '2024-07-31', // Both in summer
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -303,8 +303,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-09-30', // Last day of summer
-          endDate: '2024-10-01'   // First day of non-summer
-        }
+          endDate: '2024-10-01',   // First day of non-summer
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -318,8 +318,8 @@ describe('DateRangePicker Component', () => {
     it('should enforce minimum date (2020-01-01)', () => {
       wrapper = mount(DateRangePicker, {
         props: {
-          minDate: '2020-01-01'
-        }
+          minDate: '2020-01-01',
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -329,8 +329,8 @@ describe('DateRangePicker Component', () => {
     it('should enforce maximum date (today + 1 year)', () => {
       wrapper = mount(DateRangePicker, {
         props: {
-          maxDate: '2025-07-15'
-        }
+          maxDate: '2025-07-15',
+        },
       })
 
       const endInput = wrapper.find('[data-testid="end-date-input"]')
@@ -341,8 +341,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2019-12-31', // Before min date
-          endDate: '2024-07-31'
-        }
+          endDate: '2024-07-31',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -357,8 +357,8 @@ describe('DateRangePicker Component', () => {
     it('should disable inputs when disabled prop is true', () => {
       wrapper = mount(DateRangePicker, {
         props: {
-          disabled: true
-        }
+          disabled: true,
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -371,8 +371,8 @@ describe('DateRangePicker Component', () => {
     it('should enable inputs when disabled prop is false', () => {
       wrapper = mount(DateRangePicker, {
         props: {
-          disabled: false
-        }
+          disabled: false,
+        },
       })
 
       const startInput = wrapper.find('[data-testid="start-date-input"]')
@@ -388,8 +388,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: '2024-07-31'
-        }
+          endDate: '2024-07-31',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -402,8 +402,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-11-01',
-          endDate: '2024-11-30'
-        }
+          endDate: '2024-11-30',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -418,8 +418,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: null,
-          endDate: '2024-07-31'
-        }
+          endDate: '2024-07-31',
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -433,8 +433,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-01',
-          endDate: null
-        }
+          endDate: null,
+        },
       })
 
       await wrapper.vm.$nextTick()
@@ -460,8 +460,8 @@ describe('DateRangePicker Component', () => {
       wrapper = mount(DateRangePicker, {
         props: {
           startDate: '2024-07-15',
-          endDate: '2024-07-01' // End before start
-        }
+          endDate: '2024-07-01', // End before start
+        },
       })
 
       await wrapper.vm.$nextTick()

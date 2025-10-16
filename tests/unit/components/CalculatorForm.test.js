@@ -16,9 +16,9 @@ describe('CalculatorForm.vue - DatePicker Integration', () => {
     wrapper = mount(CalculatorForm, {
       global: {
         components: {
-          DatePicker
-        }
-      }
+          DatePicker,
+        },
+      },
     })
   })
 
@@ -97,8 +97,8 @@ describe('CalculatorForm.vue - DatePicker Integration', () => {
       
       expect(submitSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          billingDate: '2024-07-15'
-        })
+          billingDate: '2024-07-15',
+        }),
       )
     })
 
@@ -242,8 +242,8 @@ describe('CalculatorForm.vue - DatePicker Integration', () => {
       expect(submitSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           usage: 350,
-          billingDate: '2024-07-15'
-        })
+          billingDate: '2024-07-15',
+        }),
       )
     })
   })

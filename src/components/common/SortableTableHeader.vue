@@ -2,12 +2,15 @@
   <th
     class="px-4 py-2 text-left text-sm font-medium text-gray-700 uppercase tracking-wider cursor-pointer select-none"
     :class="{ 'bg-gray-100': currentSortKey === sortKey }"
-    @click="handleClick"
     :title="tooltip"
+    @click="handleClick"
   >
     <div class="flex items-center justify-between">
       <span>{{ label }}</span>
-      <span v-if="currentSortKey === sortKey" class="ml-2">
+      <span
+        v-if="currentSortKey === sortKey"
+        class="ml-2"
+      >
         <svg
           v-if="currentSortDirection === 'asc'"
           class="h-4 w-4 text-gray-600 inline"
@@ -21,7 +24,7 @@
             stroke-linejoin="round"
             stroke-width="2"
             d="M5 10l7-7m0 0l7 7m-7-7v18"
-          ></path>
+          />
         </svg>
         <svg
           v-else
@@ -36,7 +39,7 @@
             stroke-linejoin="round"
             stroke-width="2"
             d="M19 14l-7 7m0 0l-7-7m7 7V3"
-          ></path>
+          />
         </svg>
       </span>
     </div>
@@ -44,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps({
   label: {
@@ -67,18 +70,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
-});
+})
 
-const emit = defineEmits(['sort']);
+const emit = defineEmits(['sort'])
 
 const handleClick = () => {
-  let newDirection = 'desc'; // Default for a new sort key
+  let newDirection = 'desc' // Default for a new sort key
   if (props.currentSortKey === props.sortKey) {
     // Toggle direction if the same key is clicked
-    newDirection = props.currentSortDirection === 'asc' ? 'desc' : 'asc';
+    newDirection = props.currentSortDirection === 'asc' ? 'desc' : 'asc'
   }
-  emit('sort', props.sortKey, newDirection);
-};
+  emit('sort', props.sortKey, newDirection)
+}
 </script>
 
 <style scoped>

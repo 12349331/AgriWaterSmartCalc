@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   formatBillingPeriod,
-  formatCreatedTime
+  formatCreatedTime,
 } from '../../../src/utils/date-formatters.js'
 
 describe('date-formatters.js', () => {

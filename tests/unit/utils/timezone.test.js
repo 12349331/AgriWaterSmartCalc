@@ -3,7 +3,7 @@ import {
   ensureTaiwanTimezone,
   getCurrentTimestampTW,
   toTaiwanISOString,
-  TAIWAN_TIMEZONE
+  TAIWAN_TIMEZONE,
 } from '../../../src/utils/timezone.js'
 
 describe('timezone.js', () => {

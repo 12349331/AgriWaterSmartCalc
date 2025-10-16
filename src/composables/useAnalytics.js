@@ -4,10 +4,10 @@
  */
 
 export function useAnalytics() {
-  const isEnabled = import.meta.env.VITE_ENABLE_ANALYTICS === "true";
+  const isEnabled = import.meta.env.VITE_ENABLE_ANALYTICS === 'true'
 
   function trackEvent(eventName, eventData = {}) {
-    if (!isEnabled) return;
+    if (!isEnabled) return
 
     // Placeholder for analytics tracking
 
@@ -18,23 +18,23 @@ export function useAnalytics() {
   }
 
   function trackPageView(pageName) {
-    if (!isEnabled) return;
+    if (!isEnabled) return
 
 
     // Example: gtag('config', 'GA_MEASUREMENT_ID', { page_path: pageName })
   }
 
   function trackCalculation(data) {
-    trackEvent("water_calculation", {
+    trackEvent('water_calculation', {
       crop_type: data.cropType,
       field_area: data.fieldArea,
       monthly_volume: data.monthlyVolume,
       is_over_extraction: data.monthlyVolume > 2000,
-    });
+    })
   }
 
   function trackExport(format) {
-    trackEvent("export_data", { format });
+    trackEvent('export_data', { format })
   }
 
   return {
@@ -42,5 +42,5 @@ export function useAnalytics() {
     trackPageView,
     trackCalculation,
     trackExport,
-  };
+  }
 }

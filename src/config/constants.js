@@ -5,4 +5,4 @@ export const CALCULATION_PARAMS = {
   minutesPerHour: 60, // Minutes per hour conversion
   hoursPerKwhDivisor: 2, // Hours per kWh divisor for average operating hours
   overExtractionThreshold: 2000, // Warning threshold for monthly volume (m³)
-};
+}

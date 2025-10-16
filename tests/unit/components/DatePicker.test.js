@@ -9,8 +9,8 @@ describe('DatePicker.vue', () => {
   beforeEach(() => {
     wrapper = mount(DatePicker, {
       props: {
-        modelValue: '2024-07-15'
-      }
+        modelValue: '2024-07-15',
+      },
     })
   })
 

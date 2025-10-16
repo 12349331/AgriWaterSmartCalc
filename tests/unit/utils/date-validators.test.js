@@ -6,7 +6,7 @@ import {
   getPeriodLengthInDays,
   getMaxAllowedDate,
   MIN_ALLOWED_DATE,
-  MAX_BILLING_PERIOD_DAYS
+  MAX_BILLING_PERIOD_DAYS,
 } from '../../../src/utils/date-validators.js'
 
 describe('date-validators.js', () => {

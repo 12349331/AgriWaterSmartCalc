@@ -1,17 +1,20 @@
 <template>
   <div class="result-card">
     <div class="border-b border-gray-200 mb-6">
-      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+      <nav
+        class="-mb-px flex space-x-8"
+        aria-label="Tabs"
+      >
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          @click="emit('update:activeTab', tab.id)"
           :class="[
             activeTab === tab.id
               ? 'border-primary text-primary'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
             'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
           ]"
+          @click="emit('update:activeTab', tab.id)"
         >
           {{ tab.name }}
         </button>
@@ -25,19 +28,20 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   activeTab: {
     type: String,
-    default: "seasonal",
+    default: 'annual',  // User Story 004: Changed default from "seasonal" to "annual"
   },
-});
+})
 
-const emit = defineEmits(["update:activeTab"]);
+const emit = defineEmits(['update:activeTab'])
 
+// User Story 004: Reordered tabs - Annual first, Seasonal second
 const tabs = [
-  { id: "seasonal", name: "季節性趨勢" },
-  { id: "crop", name: "作物比較" },
-  { id: "annual", name: "年度趨勢" },
-  { id: "stats", name: "統計摘要" },
-];
+  { id: 'annual', name: '年度趨勢' },
+  { id: 'seasonal', name: '季節性趨勢' },
+  { id: 'crop', name: '作物比較' },
+  { id: 'stats', name: '統計摘要' },
+]
 </script>

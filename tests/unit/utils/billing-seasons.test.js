@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   determineBillingSeason,
   checkCrossSeasonBoundary,
-  isBoundaryDate
+  isBoundaryDate,
 } from '../../../src/utils/billing-seasons.js'
 
 describe('billing-seasons.js', () => {
@@ -75,31 +75,31 @@ describe('billing-seasons.js', () => {
 
     it('should throw error if startDate is missing', () => {
       expect(() => determineBillingSeason(null, '2024-07-31')).toThrow(
-        'Both startDate and endDate parameters are required'
+        'Both startDate and endDate parameters are required',
       )
     })
 
     it('should throw error if endDate is missing', () => {
       expect(() => determineBillingSeason('2024-07-01', null)).toThrow(
-        'Both startDate and endDate parameters are required'
+        'Both startDate and endDate parameters are required',
       )
     })
 
     it('should throw error if startDate is invalid', () => {
       expect(() => determineBillingSeason('invalid-date', '2024-07-31')).toThrow(
-        'Invalid startDate provided'
+        'Invalid startDate provided',
       )
     })
 
     it('should throw error if endDate is invalid', () => {
       expect(() => determineBillingSeason('2024-07-01', 'invalid-date')).toThrow(
-        'Invalid endDate provided'
+        'Invalid endDate provided',
       )
     })
 
     it('should throw error if startDate is after endDate', () => {
       expect(() => determineBillingSeason('2024-07-31', '2024-07-01')).toThrow(
-        'startDate must be earlier than or equal to endDate'
+        'startDate must be earlier than or equal to endDate',
       )
     })
   })

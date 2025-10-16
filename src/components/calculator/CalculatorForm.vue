@@ -1,15 +1,29 @@
 <template>
   <div class="result-card">
-    <h2 class="govuk-heading-l">水資源估算</h2>
+    <h2 class="govuk-heading-l">
+      水資源估算
+    </h2>
 
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <form
+      class="space-y-6"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Bill Amount -->
       <div class="govuk-form-group">
-        <label for="usage-input" class="govuk-label">
+        <label
+          for="usage-input"
+          class="govuk-label"
+        >
           電費金額 (TWD) <span class="text-danger">*</span>
         </label>
-        <p class="govuk-hint">請輸入您的電費帳單金額（新台幣）</p>
-        <p v-if="errors.billAmount" class="govuk-error-message" id="bill-amount-error">
+        <p class="govuk-hint">
+          請輸入您的電費帳單金額（新台幣）
+        </p>
+        <p
+          v-if="errors.billAmount"
+          id="bill-amount-error"
+          class="govuk-error-message"
+        >
           {{ errors.billAmount }}
         </p>
         <input
@@ -23,11 +37,15 @@
           :disabled="disabled"
           :aria-describedby="errors.billAmount ? 'bill-amount-error' : undefined"
           data-testid="usage-input"
-        />
+        >
       </div>
 
       <!-- User Story P1: Billing Period Selection (replaces single date picker) -->
-      <div data-testid="billing-period-section" role="group" aria-labelledby="billing-period-label">
+      <div
+        data-testid="billing-period-section"
+        role="group"
+        aria-labelledby="billing-period-label"
+      >
         <DateRangePicker
           v-model:start-date="billingPeriodStart"
           v-model:end-date="billingPeriodEnd"
@@ -58,14 +76,20 @@
         </div>
 
         <!-- Screen reader live region for season changes -->
-        <div aria-live="polite" class="sr-only">
+        <div
+          aria-live="polite"
+          class="sr-only"
+        >
           當前計價季節：{{ determinedSeason }}
         </div>
       </div>
 
       <!-- Electricity Type -->
       <div class="govuk-form-group">
-        <label for="electricity-type" class="govuk-label">
+        <label
+          for="electricity-type"
+          class="govuk-label"
+        >
           用電種類
         </label>
         <select
@@ -74,8 +98,12 @@
           class="input-field w-full"
           :disabled="disabled"
         >
-          <option value="表燈非營業用">非營業用</option>
-          <option value="表燈營業用">營業用</option>
+          <option value="表燈非營業用">
+            非營業用
+          </option>
+          <option value="表燈營業用">
+            營業用
+          </option>
         </select>
       </div>
 
@@ -84,10 +112,17 @@
 
       <!-- Crop Type -->
       <div class="govuk-form-group">
-        <label for="crop-type" class="govuk-label">
+        <label
+          for="crop-type"
+          class="govuk-label"
+        >
           作物類型 <span class="text-danger">*</span>
         </label>
-        <p v-if="errors.cropType" class="govuk-error-message" id="crop-type-error">
+        <p
+          v-if="errors.cropType"
+          id="crop-type-error"
+          class="govuk-error-message"
+        >
           {{ errors.cropType }}
         </p>
         <select
@@ -98,8 +133,14 @@
           :disabled="disabled"
           :aria-describedby="errors.cropType ? 'crop-type-error' : undefined"
         >
-          <option value="">請選擇作物</option>
-          <option v-for="crop in cropTypes" :key="crop.id" :value="crop.name">
+          <option value="">
+            請選擇作物
+          </option>
+          <option
+            v-for="crop in cropTypes"
+            :key="crop.id"
+            :value="crop.name"
+          >
             {{ crop.name }} - {{ crop.description }}
           </option>
         </select>
@@ -107,13 +148,23 @@
 
       <!-- Field Area -->
       <div class="govuk-form-group">
-        <label for="field-area" class="govuk-label">
+        <label
+          for="field-area"
+          class="govuk-label"
+        >
           耕作面積 (分地) <span class="text-danger">*</span>
         </label>
-        <p class="govuk-hint" id="field-area-hint">
+        <p
+          id="field-area-hint"
+          class="govuk-hint"
+        >
           1 分地 ≈ 0.0969 公頃 ≈ 969 平方公尺
         </p>
-        <p v-if="errors.fieldArea" class="govuk-error-message" id="field-area-error">
+        <p
+          v-if="errors.fieldArea"
+          id="field-area-error"
+          class="govuk-error-message"
+        >
           {{ errors.fieldArea }}
         </p>
         <input
@@ -126,7 +177,7 @@
           placeholder="請輸入耕作面積"
           :disabled="disabled"
           :aria-describedby="errors.fieldArea ? 'field-area-error field-area-hint' : 'field-area-hint'"
-        />
+        >
       </div>
 
       <!-- Region
@@ -168,6 +219,117 @@
         </div>
       </div> -->
 
+      <!-- User Story 004: Pump Parameters Section (moved from AdvancedParams) -->
+      <div class="govuk-form-group mt-6 border-t pt-6">
+        <h3 class="govuk-heading-m">
+          抽水設備參數
+        </h3>
+
+        <!-- Horsepower -->
+        <div class="govuk-form-group">
+          <label
+            for="horsepower"
+            class="govuk-label"
+          >
+            抽水馬力 (HP) <span class="text-danger">*</span>
+          </label>
+          <p class="govuk-hint">
+            預設值: 5.0 HP
+          </p>
+          <p
+            v-if="errors.horsepower"
+            id="horsepower-error"
+            class="govuk-error-message"
+          >
+            {{ errors.horsepower }}
+          </p>
+          <input
+            id="horsepower"
+            v-model.number="localPumpParams.horsepower"
+            type="number"
+            step="0.1"
+            min="1.0"
+            max="50.0"
+            required
+            class="input-field w-full"
+            :class="{ 'border-danger': errors.horsepower }"
+            :disabled="disabled"
+            aria-required="true"
+            :aria-describedby="errors.horsepower ? 'horsepower-error' : undefined"
+            data-testid="horsepower-input"
+          >
+        </div>
+
+        <!-- Efficiency -->
+        <div class="govuk-form-group">
+          <label
+            for="efficiency"
+            class="govuk-label"
+          >
+            抽水效率 <span class="text-danger">*</span>
+          </label>
+          <p class="govuk-hint">
+            預設值: 0.75 (75%)，範圍: 0.0-1.0
+          </p>
+          <p
+            v-if="errors.efficiency"
+            id="efficiency-error"
+            class="govuk-error-message"
+          >
+            {{ errors.efficiency }}
+          </p>
+          <input
+            id="efficiency"
+            v-model.number="localPumpParams.efficiency"
+            type="number"
+            step="0.01"
+            min="0"
+            max="1"
+            required
+            class="input-field w-full"
+            :class="{ 'border-danger': errors.efficiency }"
+            :disabled="disabled"
+            aria-required="true"
+            :aria-describedby="errors.efficiency ? 'efficiency-error' : undefined"
+            data-testid="efficiency-input"
+          >
+        </div>
+
+        <!-- Well Depth -->
+        <div class="govuk-form-group">
+          <label
+            for="wellDepth"
+            class="govuk-label"
+          >
+            水井深度 (公尺) <span class="text-danger">*</span>
+          </label>
+          <p class="govuk-hint">
+            預設值: 20 公尺
+          </p>
+          <p
+            v-if="errors.wellDepth"
+            id="wellDepth-error"
+            class="govuk-error-message"
+          >
+            {{ errors.wellDepth }}
+          </p>
+          <input
+            id="wellDepth"
+            v-model.number="localPumpParams.wellDepth"
+            type="number"
+            step="1"
+            min="0"
+            required
+            class="input-field w-full"
+            :class="{ 'border-danger': errors.wellDepth }"
+            :disabled="disabled"
+            aria-required="true"
+            :aria-describedby="errors.wellDepth ? 'wellDepth-error' : undefined"
+            data-testid="wellDepth-input"
+          >
+        </div>
+      </div>
+
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-4 pt-4">
         <button
@@ -180,9 +342,9 @@
         </button>
         <button
           type="button"
-          @click="handleReset"
           class="btn-secondary"
           :disabled="disabled"
+          @click="handleReset"
         >
           重設
         </button>
@@ -192,11 +354,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useConfigStore } from "@/stores/config";
-import { useValidation } from "@/composables/useValidation";
-import DateRangePicker from "@/components/calculator/DateRangePicker.vue";
-import { useBillingPeriod } from "@/composables/useBillingPeriod";
+import { ref, computed, watch } from 'vue'
+import { useConfigStore } from '@/stores/config'
+import { useValidation } from '@/composables/useValidation'
+import DateRangePicker from '@/components/calculator/DateRangePicker.vue'
+import { useBillingPeriod } from '@/composables/useBillingPeriod'
 
 const props = defineProps({
   modelValue: {
@@ -207,106 +369,150 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-});
+  pumpParams: {
+    type: Object,
+    default: () => ({
+      horsepower: 5.0,
+      efficiency: 0.75,
+      wellDepth: 20.0,
+    }),
+  },
+})
 
-const emit = defineEmits(["update:modelValue", "submit", "reset"]);
+const emit = defineEmits(['update:modelValue', 'update:pumpParams', 'submit', 'reset'])
 
-const configStore = useConfigStore();
-const { validateField } = useValidation();
+const configStore = useConfigStore()
+const { validateField } = useValidation()
 
 // User Story P1: Billing period management (replaces single date)
 const {
   validatePeriod,
-  determineSeason,
-  checkCrossSeason
-} = useBillingPeriod();
+} = useBillingPeriod()
 
 // Billing period state
-const billingPeriodStart = ref(null);
-const billingPeriodEnd = ref(null);
-const determinedSeason = ref(null);
-const periodValidationError = ref(null);
-const hasCrossSeasonWarning = ref(false);
+const billingPeriodStart = ref(null)
+const billingPeriodEnd = ref(null)
+const determinedSeason = ref(null)
+const periodValidationError = ref(null)
+const hasCrossSeasonWarning = ref(false)
+
+// User Story 004: Pump parameters state
+const localPumpParams = ref({ ...props.pumpParams })
 
 // Local form data
 const formData = ref({
   billAmount: 0,
-  electricityType: "表燈非營業用",
-  billingSeason: "夏月", // Will be overridden by auto-determination
-  cropType: "",
+  electricityType: '表燈非營業用',
+  billingSeason: '夏月', // Will be overridden by auto-determination
+  cropType: '',
   fieldArea: 0,
-  region: "south",
+  region: 'south',
   ...props.modelValue,
-});
+})
 
 // Validation errors
-const errors = ref({});
+const errors = ref({
+  horsepower: null,
+  efficiency: null,
+  wellDepth: null,
+})
 
 // Track if form has been submitted at least once
-const hasBeenSubmitted = ref(false);
+const hasBeenSubmitted = ref(false)
 
 // Event handlers for DateRangePicker
 function handleSeasonChanged(season) {
-  determinedSeason.value = season;
-  formData.value.billingSeason = season;
+  determinedSeason.value = season
+  formData.value.billingSeason = season
 }
 
 function handleCrossSeasonWarning(isCross) {
-  hasCrossSeasonWarning.value = isCross;
+  hasCrossSeasonWarning.value = isCross
 }
 
 function handleValidationError(result) {
   if (result.error) {
-    periodValidationError.value = result.error;
+    periodValidationError.value = result.error
   } else {
-    periodValidationError.value = null;
+    periodValidationError.value = null
   }
 }
 
 // Crop types from config
-const cropTypes = computed(() => configStore.cropTypes);
+const cropTypes = computed(() => configStore.cropTypes)
 
 // Check if form has errors
 const hasErrors = computed(() => {
   // Check field validation errors
-  const fieldErrors = Object.keys(errors.value).some((key) => errors.value[key] !== null);
+  const fieldErrors = Object.keys(errors.value).some((key) => errors.value[key] !== null)
 
   // Check billing period validation error
-  const periodError = !!periodValidationError.value;
+  const periodError = !!periodValidationError.value
 
-  return fieldErrors || periodError;
-});
+  return fieldErrors || periodError
+})
 
 // Watch form data and validate
 watch(
   () => formData.value.billAmount,
   (value) => {
-    errors.value.billAmount = validateField("billAmount", value);
-  }
-);
+    errors.value.billAmount = validateField('billAmount', value)
+  },
+)
 
 watch(
   () => formData.value.fieldArea,
   (value) => {
-    errors.value.fieldArea = validateField("fieldArea", value);
-  }
-);
+    errors.value.fieldArea = validateField('fieldArea', value)
+  },
+)
 
 watch(
   () => formData.value.cropType,
   (value) => {
-    errors.value.cropType = validateField("cropType", value);
-  }
-);
+    errors.value.cropType = validateField('cropType', value)
+  },
+)
+
+// User Story 004: Watch and validate pump parameters
+watch(
+  () => localPumpParams.value.horsepower,
+  (value) => {
+    errors.value.horsepower = validateField('pumpHorsepower', value)
+  },
+)
+
+watch(
+  () => localPumpParams.value.efficiency,
+  (value) => {
+    errors.value.efficiency = validateField('pumpEfficiency', value)
+  },
+)
+
+watch(
+  () => localPumpParams.value.wellDepth,
+  (value) => {
+    errors.value.wellDepth = validateField('wellDepth', value)
+  },
+)
 
 // Emit updates
 watch(
   formData,
   (newValue) => {
-    emit("update:modelValue", newValue);
+    emit('update:modelValue', newValue)
   },
-  { deep: true }
-);
+  { deep: true },
+)
+
+// User Story 004: Emit pump params updates
+watch(
+  localPumpParams,
+  (newValue) => {
+    emit('update:pumpParams', newValue)
+  },
+  { deep: true },
+)
 
 // Watch for billing period changes and auto-recalculate if form was previously submitted
 watch(
@@ -329,71 +535,86 @@ watch(
       formData.value.fieldArea > 0
     ) {
       // Validate period before auto-submit
-      const periodValidation = validatePeriod(newStart, newEnd);
+      const periodValidation = validatePeriod(newStart, newEnd)
       if (periodValidation.valid) {
         // Auto-submit the form
-        handleSubmit();
+        handleSubmit()
       }
     }
-  }
-);
+  },
+)
 
 function handleSubmit() {
   // User Story P1: Validate billing period first
-  const periodValidation = validatePeriod(billingPeriodStart.value, billingPeriodEnd.value);
+  const periodValidation = validatePeriod(billingPeriodStart.value, billingPeriodEnd.value)
 
   if (!periodValidation.valid) {
-    periodValidationError.value = periodValidation.error;
-    return;
+    periodValidationError.value = periodValidation.error
+    return
   }
 
-  // Validate all fields
+  // User Story 004: Validate all fields including pump parameters
   errors.value = {
-    billAmount: validateField("billAmount", formData.value.billAmount),
-    fieldArea: validateField("fieldArea", formData.value.fieldArea),
-    cropType: validateField("cropType", formData.value.cropType),
-  };
+    billAmount: validateField('billAmount', formData.value.billAmount),
+    fieldArea: validateField('fieldArea', formData.value.fieldArea),
+    cropType: validateField('cropType', formData.value.cropType),
+    horsepower: validateField('pumpHorsepower', localPumpParams.value.horsepower),
+    efficiency: validateField('pumpEfficiency', localPumpParams.value.efficiency),
+    wellDepth: validateField('wellDepth', localPumpParams.value.wellDepth),
+  }
 
   // Check for errors
   if (hasErrors.value) {
-    return;
+    return
   }
 
-  // User Story P1: Include billing period in submission
+  // User Story 004: Include billing period and pump parameters in submission
   const submissionData = {
     ...formData.value,
     billingPeriodStart: billingPeriodStart.value,
     billingPeriodEnd: billingPeriodEnd.value,
     billingSeason: determinedSeason.value,
-  };
+    pumpParams: localPumpParams.value,
+  }
 
   // Mark as submitted for auto-recalculation on date changes
-  hasBeenSubmitted.value = true;
+  hasBeenSubmitted.value = true
 
-  emit("submit", submissionData);
+  emit('submit', submissionData)
 }
 
 function handleReset() {
   formData.value = {
     billAmount: 0,
-    electricityType: "表燈非營業用",
-    billingSeason: "夏月",
-    cropType: "",
+    electricityType: '表燈非營業用',
+    billingSeason: '夏月',
+    cropType: '',
     fieldArea: 0,
-    region: "south",
-  };
-  errors.value = {};
+    region: 'south',
+  }
+  errors.value = {
+    horsepower: null,
+    efficiency: null,
+    wellDepth: null,
+  }
+
+  // User Story 004: Reset pump parameters to defaults
+  localPumpParams.value = {
+    horsepower: 5.0,
+    efficiency: 0.75,
+    wellDepth: 20.0,
+  }
 
   // User Story P1: Reset billing period
-  billingPeriodStart.value = null;
-  billingPeriodEnd.value = null;
-  determinedSeason.value = null;
-  periodValidationError.value = null;
-  hasCrossSeasonWarning.value = false;
+  billingPeriodStart.value = null
+  billingPeriodEnd.value = null
+  determinedSeason.value = null
+  periodValidationError.value = null
+  hasCrossSeasonWarning.value = false
 
   // Reset submission tracking
-  hasBeenSubmitted.value = false;
+  hasBeenSubmitted.value = false
 
-  emit("reset");
+  emit('reset')
 }
 </script>

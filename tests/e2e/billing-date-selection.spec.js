@@ -102,7 +102,7 @@ test.describe('US1: 用電日期選擇 - E2E Acceptance Tests', () => {
       { date: '2024-06-01', season: '夏月', info: '夏月開始' },
       { date: '2024-09-30', season: '夏月', info: '夏月結束' },
       { date: '2024-10-01', season: '非夏月', info: '非夏月開始' },
-      { date: '2024-05-31', season: '非夏月', info: '非夏月結束' }
+      { date: '2024-05-31', season: '非夏月', info: '非夏月結束' },
     ]
     
     for (const { date, season, info } of boundaryDates) {
