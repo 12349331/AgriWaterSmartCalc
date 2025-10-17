@@ -1,8 +1,8 @@
 <template>
   <div class="result-card">
-    <div class="border-b border-gray-200 mb-6">
+    <div class="tabs-wrapper">
       <nav
-        class="-mb-px flex space-x-8"
+        class="tabs-nav"
         aria-label="Tabs"
       >
         <button
@@ -12,7 +12,7 @@
             activeTab === tab.id
               ? 'border-primary text-primary'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            'tab-button',
           ]"
           @click="emit('update:activeTab', tab.id)"
         >
@@ -45,3 +45,73 @@ const tabs = [
   { id: 'stats', name: '統計摘要' },
 ]
 </script>
+
+<style scoped>
+.result-card {
+  overflow: hidden;
+}
+
+.tabs-wrapper {
+  border-b: 1px solid rgb(229, 231, 235);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabs-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  min-width: min-content;
+}
+
+.tab-button {
+  white-space: nowrap;
+  padding: 1rem 0.5rem;
+  border-bottom: 2px solid;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.tab-content {
+  overflow: auto;
+  width: 100%;
+}
+
+/* 响应式調整 */
+@media (min-width: 640px) {
+  .tabs-nav {
+    gap: 1rem;
+  }
+
+  .tab-button {
+    padding: 1rem 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tabs-nav {
+    gap: 2rem;
+  }
+
+  .tab-button {
+    padding: 1rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* 超小屏幕（< 360px） */
+@media (max-width: 359px) {
+  .tab-button {
+    padding: 0.75rem 0.375rem;
+    font-size: 0.75rem;
+  }
+
+  .tabs-nav {
+    gap: 0.25rem;
+  }
+}
+</style>

@@ -1,12 +1,20 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
+import Components from 'unplugin-vue-components/vite';
+import { VantResolver } from 'unplugin-vue-components/resolvers';
 import path from "path";
 import { fileURLToPath, URL } from "node:url";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    Components({
+      resolvers: [VantResolver()],
+    }),
+  ],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -41,6 +49,7 @@ export default defineConfig({
         manualChunks: {
           "vue-vendor": ["vue", "pinia"],
           echarts: ["echarts/core", "vue-echarts"],
+          vant: ["vant"],
           utils: ["./src/utils/formulas.js", "./src/utils/validators.js"],
         },
       },

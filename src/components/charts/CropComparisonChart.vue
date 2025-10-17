@@ -127,7 +127,10 @@ const chartOption = computed(() => ({
 
 <style scoped>
 .chart-container {
+  width: 100%;
   height: 300px;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 @media (min-width: 640px) {

@@ -5,6 +5,9 @@ import App from './App.vue'
 // Import Tailwind CSS
 import './assets/styles/main.css'
 
+// Import Vant theme customization
+import './assets/styles/vant-theme.css'
+
 // Import ECharts configuration (tree-shaking)
 import './config/echarts'
 

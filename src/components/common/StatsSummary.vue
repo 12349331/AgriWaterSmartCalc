@@ -337,17 +337,57 @@ const formattedTotalKwh = computed(() => {
 }
 
 /* 響應式調整 */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .stat-value {
     @apply text-2xl;
   }
 
-  .stat-card {
-    @apply p-4;
+  .stat-card-icon-wrapper {
+    @apply w-8 h-8;
   }
 
   .stat-card-icon {
-    @apply w-10 h-10;
+    @apply w-8 h-8;
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-value {
+    @apply text-xl;
+  }
+
+  .stat-card {
+    @apply p-3;
+  }
+
+  .stat-label {
+    @apply text-xs;
+  }
+
+  .stat-unit {
+    @apply text-xs;
+  }
+
+  .stat-card-icon {
+    @apply w-8 h-8;
+  }
+
+  .stats-summary-container {
+    @apply p-4 mb-4;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-value {
+    @apply text-lg;
+  }
+
+  .stat-card {
+    @apply p-2;
+  }
+
+  .stat-card-icon-wrapper {
+    @apply opacity-5 top-1 right-1;
   }
 }
 </style>

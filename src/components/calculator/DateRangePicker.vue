@@ -3,44 +3,53 @@
     data-testid="date-range-container"
     class="date-range-picker"
   >
-    <!-- Date Range Inputs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Start Date -->
-      <div>
-        <label
-          for="start-date"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          電費計費起始日 <span class="text-red-500">*</span>
-        </label>
-        <DateScrollPicker
-          :model-value="startDate"
-          :min-date="minDate"
-          :max-date="maxDate"
-          :disabled="disabled"
-          :label="i18n.billingPeriod.startDate"
-          @update:model-value="handleStartDateChange"
-        />
-      </div>
+    <!-- Date Range Field -->
+    <div class="flex flex-col">
+      <label
+        id="date-range-label"
+        class="block text-sm font-medium text-gray-700 mb-1"
+      >
+        電費計費期間 <span class="text-red-500">*</span>
+      </label>
 
-      <!-- End Date -->
-      <div>
-        <label
-          for="end-date"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          電費計費結束日 <span class="text-red-500">*</span>
-        </label>
-        <DateScrollPicker
-          :model-value="endDate"
+      <van-field
+        v-model="displayRange"
+        readonly
+        is-link
+        placeholder="請選擇起訖日期"
+        aria-labelledby="date-range-label"
+        data-testid="date-range-field"
+        class="date-range-field"
+        @click="showPicker = true"
+      />
+    </div>
+
+    <!-- Vant PickerGroup with DatePickers (Roller Style) -->
+    <van-popup
+      v-model:show="showPicker"
+      position="bottom"
+      :style="{ height: '50%' }"
+    >
+      <van-picker-group
+        title="選擇計費期間"
+        :tabs="['起始日期', '結束日期']"
+        @confirm="onConfirm"
+        @cancel="showPicker = false"
+      >
+        <van-date-picker
+          v-model="startDateArray"
           :min-date="minDate"
           :max-date="maxDate"
-          :disabled="disabled"
-          :label="i18n.billingPeriod.endDate"
-          @update:model-value="handleEndDateChange"
+          :columns-type="['year', 'month', 'day']"
         />
-      </div>
-    </div>
+        <van-date-picker
+          v-model="endDateArray"
+          :min-date="computedEndMinDate"
+          :max-date="maxDate"
+          :columns-type="['year', 'month', 'day']"
+        />
+      </van-picker-group>
+    </van-popup>
 
     <!-- Season Display -->
     <div
@@ -59,6 +68,7 @@
       >
         {{ determinedSeason }}
       </span>
+      <span class="text-xs text-gray-500">(自動判定)</span>
     </div>
 
     <!-- Validation Error -->
@@ -144,10 +154,9 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useBillingPeriod } from '@/composables/useBillingPeriod'
 import { MIN_ALLOWED_DATE, getMaxAllowedDate } from '@/utils/date-validators'
-import DateScrollPicker from '@/components/calculator/DateScrollPicker.vue'
 
 const props = defineProps({
   startDate: {
@@ -180,6 +189,9 @@ const emit = defineEmits([
   'validation-error',
 ])
 
+// Picker visibility
+const showPicker = ref(false)
+
 // Use billing period composable
 const {
   validatePeriod,
@@ -187,13 +199,53 @@ const {
   checkCrossSeason,
 } = useBillingPeriod()
 
-// i18n (inline for now, will integrate with i18n store later)
-const i18n = {
-  billingPeriod: {
-    startDate: '電費計費起始日',
-    endDate: '電費計費結束日',
-  },
-}
+// Min/Max dates for picker
+const minDate = computed(() => new Date(props.minDate))
+const maxDate = computed(() => new Date(props.maxDate))
+
+// Date arrays for pickers (format: [year, month, day])
+const startDateArray = ref(
+  props.startDate
+    ? [
+        new Date(props.startDate).getFullYear().toString(),
+        String(new Date(props.startDate).getMonth() + 1).padStart(2, '0'),
+        String(new Date(props.startDate).getDate()).padStart(2, '0')
+      ]
+    : [new Date().getFullYear().toString(), '01', '01']
+)
+
+const endDateArray = ref(
+  props.endDate
+    ? [
+        new Date(props.endDate).getFullYear().toString(),
+        String(new Date(props.endDate).getMonth() + 1).padStart(2, '0'),
+        String(new Date(props.endDate).getDate()).padStart(2, '0')
+      ]
+    : [new Date().getFullYear().toString(), '01', '01']
+)
+
+// Computed end min date (should be after start date)
+const computedEndMinDate = computed(() => {
+  if (!startDateArray.value || startDateArray.value.length < 3) {
+    return minDate.value
+  }
+  const [year, month, day] = startDateArray.value
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+})
+
+// Display range format
+const displayRange = computed(() => {
+  if (!props.startDate || !props.endDate) return ''
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr)
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}/${day}`
+  }
+
+  return `${formatDate(props.startDate)} - ${formatDate(props.endDate)}`
+})
 
 // Computed: validation result
 const validationResult = computed(() => {
@@ -216,28 +268,49 @@ const isCrossSeason = computed(() => {
   return checkCrossSeason(props.startDate, props.endDate)
 })
 
-// Computed: has error
-const hasError = computed(() => {
-  return !!validationResult.value.error
+// Watch props to update arrays
+watch(() => props.startDate, (newVal) => {
+  if (newVal) {
+    const date = new Date(newVal)
+    startDateArray.value = [
+      date.getFullYear().toString(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0')
+    ]
+  }
 })
 
-// Event handlers
-function handleStartDateChange(newValue) {
-  emit('update:startDate', newValue)
-}
+watch(() => props.endDate, (newVal) => {
+  if (newVal) {
+    const date = new Date(newVal)
+    endDateArray.value = [
+      date.getFullYear().toString(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0')
+    ]
+  }
+})
 
-function handleEndDateChange(newValue) {
-  emit('update:endDate', newValue)
+// Handle confirmation
+const onConfirm = () => {
+  const [startYear, startMonth, startDay] = startDateArray.value
+  const [endYear, endMonth, endDay] = endDateArray.value
+
+  const startDateStr = `${startYear}-${startMonth}-${startDay}`
+  const endDateStr = `${endYear}-${endMonth}-${endDay}`
+
+  emit('update:startDate', startDateStr)
+  emit('update:endDate', endDateStr)
+  showPicker.value = false
 }
 
 // Watch for validation changes and emit events
 watch([() => props.startDate, () => props.endDate], () => {
   const result = validationResult.value
 
-  // Always emit validation result (even if no error/warning)
-  if (result.error || result.warning) {
-    emit('validation-error', result)
-  }
+  // BUG FIX: Always emit validation result to clear errors when corrected
+  // Previously only emitted when there was an error, leaving stale error state
+  emit('validation-error', result)
 
   // Emit season changed if valid period
   const season = determinedSeason.value
@@ -252,15 +325,16 @@ watch([() => props.startDate, () => props.endDate], () => {
 </script>
 
 <style scoped>
-@reference "../../assets/styles/main.css";
-
-.date-range-picker {
-  @apply space-y-2;
+.date-range-field {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
 }
 
-.input-field {
-  @apply px-3 py-2 border border-gray-300 rounded-md shadow-sm;
-  @apply focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
-  @apply disabled:bg-gray-100 disabled:cursor-not-allowed;
+.date-range-field :deep(.van-field__control) {
+  color: #111827;
+}
+
+.date-range-field :deep(.van-field__control:disabled) {
+  color: #6b7280;
 }
 </style>
