@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { reverseBillToKwh, reverseBillToKwhCrossVersion } from '@/composables/usePowerCalculator'
+import logger from '@/utils/logger'
 import {
   calculateWaterFlowRate,
   calculateMonthlyVolume,
@@ -190,7 +191,12 @@ export const useCalculationStore = defineStore('calculation', () => {
       // Normalize data (convert object format to array if needed)
       const normalizedData = normalizeTaipowerData(rawData)
 
-      if (normalizedData.length === 0) {
+      // Check if data is valid (handle both array and object formats)
+      const isValidData = normalizedData.pricing_types
+        ? normalizedData.pricing_types.length > 0
+        : Array.isArray(normalizedData) && normalizedData.length > 0
+
+      if (!isValidData) {
         throw new Error('API 返回資料格式錯誤或為空')
       }
 
@@ -230,7 +236,7 @@ export const useCalculationStore = defineStore('calculation', () => {
           )
 
           const dataCount = localData.pricing_types ? localData.pricing_types.length : localData.length
-          console.log(
+          logger.info(
             '✅ 成功載入本地完整定價資料，共',
             dataCount,
             '筆',
@@ -239,7 +245,7 @@ export const useCalculationStore = defineStore('calculation', () => {
           return localData
         }
       } catch (localError) {
-        console.warn('⚠️ 載入本地電價資料失敗:', localError)
+        logger.warn('⚠️ 載入本地電價資料失敗:', localError)
       }
 
       // **降級策略 2: 使用 LocalStorage 快取**
@@ -447,7 +453,7 @@ export const useCalculationStore = defineStore('calculation', () => {
           }
         }
       } catch (error) {
-        console.error('跨版本計算失敗:', error)
+        logger.error('跨版本計算失敗:', error)
         // Fallback to simple calculation
         kwhResult = calculatedKwh.value
       }
@@ -526,7 +532,7 @@ export const useCalculationStore = defineStore('calculation', () => {
         pricingDataSource.value = 'local'
       }
     } catch (error) {
-      console.warn(
+      logger.warn(
         '⚠️ 初始化：本地完整定價資料載入失敗，將在首次計算時嘗試從 API 取得',
       )
     }

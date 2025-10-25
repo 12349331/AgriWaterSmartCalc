@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import logger from '@/utils/logger'
 import { v4 as uuidv4 } from 'uuid'
 import { getCurrentTimestampTW } from '../utils/timezone' // T024: Import timezone utility
 
@@ -147,7 +148,7 @@ export const useHistoryStore = defineStore('history', () => {
         JSON.stringify(records.value),
       )
     } catch (error) {
-      console.error('Failed to save to localStorage:', error)
+      logger.error('Failed to save to localStorage:', error)
       throw new Error('儲存失敗，可能空間不足')
     }
   }
@@ -159,7 +160,7 @@ export const useHistoryStore = defineStore('history', () => {
         records.value = JSON.parse(saved)
       }
     } catch (error) {
-      console.error('Failed to load from localStorage:', error)
+      logger.error('Failed to load from localStorage:', error)
     }
   }
 

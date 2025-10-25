@@ -4,6 +4,7 @@
  */
 
 import versionsIndex from '../data/pricing/versions.json' with { type: 'json' }
+import logger from '@/utils/logger'
 
 /**
  * 電價版本管理
@@ -66,7 +67,7 @@ export function usePricingVersion() {
       const version = findVersionByDate(currentDate)
 
       if (!version) {
-        console.warn(`找不到日期 ${currentDate.toISOString()} 的電價版本`)
+        logger.warn(`找不到日期 ${currentDate.toISOString()} 的電價版本`)
         break
       }
 
@@ -111,7 +112,7 @@ export function usePricingVersion() {
       const module = await import(`../data/pricing/${versionId}.json`)
       return module.default
     } catch (error) {
-      console.error(`載入電價資料失敗 (${versionId}):`, error)
+      logger.error(`載入電價資料失敗 (${versionId}):`, error)
       throw new Error(`無法載入電價版本 ${versionId}`)
     }
   }

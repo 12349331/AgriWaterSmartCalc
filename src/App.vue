@@ -188,6 +188,7 @@
 </template>
 
 <script setup>
+import logger from '@/utils/logger'
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useCalculationStore } from '@/stores/calculation'
 import { useHistoryStore } from '@/stores/history'
@@ -405,7 +406,7 @@ onMounted(async () => {
       // Silently fail - will use fallback calculation
     })
   } catch (error) {
-    console.error('Initialization error:', error)
+    logger.error('Initialization error:', error)
   }
 })
 </script>

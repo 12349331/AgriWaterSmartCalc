@@ -14,7 +14,7 @@ export function usePerformance() {
         const connectTime = perfData.responseEnd - perfData.requestStart
         const renderTime = perfData.domComplete - perfData.domLoading
 
-        console.log('[Performance] Page Load Metrics:', {
+        logger.debug('[Performance] Page Load Metrics:', {
           totalLoadTime: `${pageLoadTime}ms`,
           networkTime: `${connectTime}ms`,
           renderTime: `${renderTime}ms`,
@@ -34,7 +34,7 @@ export function usePerformance() {
 
     if (renderTime > 16) {
       // Log if render takes longer than one frame (16ms at 60fps)
-      console.warn(
+      logger.warn(
         `[Performance] Slow render: ${componentName} took ${renderTime.toFixed(2)}ms`,
       )
     }
@@ -49,7 +49,7 @@ export function usePerformance() {
       const entries = list.getEntries()
       const lastEntry = entries[entries.length - 1]
 
-      console.log(
+      logger.debug(
         '[Performance] LCP:',
         lastEntry.renderTime || lastEntry.loadTime,
       )

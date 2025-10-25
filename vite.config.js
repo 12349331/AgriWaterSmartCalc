@@ -50,7 +50,7 @@ export default defineConfig({
           "vue-vendor": ["vue", "pinia"],
           echarts: ["echarts/core", "vue-echarts"],
           vant: ["vant"],
-          utils: ["./src/utils/formulas.js", "./src/utils/validators.js"],
+          utils: ["./src/utils/formulas.js"],
         },
       },
     },

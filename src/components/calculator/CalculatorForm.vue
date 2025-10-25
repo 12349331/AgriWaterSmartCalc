@@ -433,6 +433,7 @@
 </template>
 
 <script setup>
+import logger from '@/utils/logger'
 import { ref, computed, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import { useCalculationStore } from '@/stores/calculation' // NEW: For dirty state tracking
@@ -627,7 +628,7 @@ function saveFormDraft() {
     localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(draft))
     localStorage.setItem(FORM_DRAFT_EXPIRY_KEY, expiryTime.toString())
   } catch (error) {
-    console.warn('Failed to save form draft to localStorage:', error)
+    logger.warn('Failed to save form draft to localStorage:', error)
   }
 }
 
@@ -668,7 +669,7 @@ function restoreFormDraft() {
 
     return true
   } catch (error) {
-    console.warn('Failed to restore form draft from localStorage:', error)
+    logger.warn('Failed to restore form draft from localStorage:', error)
     return false
   }
 }
@@ -679,7 +680,7 @@ function clearFormDraft() {
     localStorage.removeItem(FORM_DRAFT_KEY)
     localStorage.removeItem(FORM_DRAFT_EXPIRY_KEY)
   } catch (error) {
-    console.warn('Failed to clear form draft from localStorage:', error)
+    logger.warn('Failed to clear form draft from localStorage:', error)
   }
 }
 

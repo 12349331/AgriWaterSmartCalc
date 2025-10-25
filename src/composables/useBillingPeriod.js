@@ -8,6 +8,7 @@
  */
 
 import { ref, computed } from 'vue'
+import logger from '@/utils/logger'
 import {
   validateBillingPeriod,
   isWithinRange,
@@ -55,7 +56,7 @@ export function useBillingPeriod() {
     try {
       return determineBillingSeason(start, end)
     } catch (error) {
-      console.error('[useBillingPeriod] Failed to determine season:', error)
+      logger.error('[useBillingPeriod] Failed to determine season:', error)
       return null
     }
   }

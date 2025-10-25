@@ -62,6 +62,7 @@
 </template>
 
 <script setup>
+import logger from '@/utils/logger'
 import { ref, onErrorCaptured } from 'vue'
 
 const hasError = ref(false)
@@ -72,7 +73,7 @@ onErrorCaptured((err, instance, info) => {
   errorDetails.value = `Error: ${err.message}\nInfo: ${info}\nStack: ${err.stack}`
 
   // Log to console for debugging
-  console.error('Error boundary caught:', err, instance, info)
+  logger.error('Error boundary caught:', err, instance, info)
 
   // Prevent error from propagating
   return false

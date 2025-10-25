@@ -12,6 +12,7 @@
 
 // Import pricing versions metadata
 import versionsData from '@/data/pricing/versions.json';
+import logger from '@/utils/logger';
 
 // 使用 Vite 的 import.meta.glob 預先載入所有 JSON 檔案
 const pricingModules = import.meta.glob('@/data/pricing/*.json', { eager: true });
@@ -32,7 +33,7 @@ function convertJSONToPricingFormat(jsonData) {
   );
 
   if (!targetType) {
-    console.warn('找不到「表燈非營業用」電價資料');
+    logger.warn('找不到「表燈非營業用」電價資料');
     return null;
   }
 
@@ -41,7 +42,7 @@ function convertJSONToPricingFormat(jsonData) {
   const nonSummerSeason = targetType.seasons.find(s => s.計費月份 === '非夏月');
 
   if (!summerSeason || !nonSummerSeason) {
-    console.warn('找不到季節級距資料');
+    logger.warn('找不到季節級距資料');
     return null;
   }
 
@@ -70,7 +71,7 @@ function convertJSONToPricingFormat(jsonData) {
 function loadAllPricingVersions() {
   try {
     // Debug: 顯示所有可用的模組路徑
-    console.log('可用的定價模組:', Object.keys(pricingModules));
+    logger.debug('可用的定價模組:', Object.keys(pricingModules));
 
     const versions = versionsData.versions;
     const loadedRates = [];
@@ -82,8 +83,8 @@ function loadAllPricingVersions() {
         const jsonModule = pricingModules[modulePath];
 
         if (!jsonModule) {
-          console.warn(`找不到模組: ${modulePath}`);
-          console.warn('嘗試的路徑:', modulePath);
+          logger.warn(`找不到模組: ${modulePath}`);
+          logger.warn('嘗試的路徑:', modulePath);
           continue;
         }
 
@@ -95,7 +96,7 @@ function loadAllPricingVersions() {
           loadedRates.push(converted);
         }
       } catch (error) {
-        console.warn(`無法載入電價版本 ${versionInfo.file}:`, error);
+        logger.warn(`無法載入電價版本 ${versionInfo.file}:`, error);
       }
     }
 
@@ -103,9 +104,9 @@ function loadAllPricingVersions() {
     loadedRates.sort((a, b) => new Date(b.effective_from) - new Date(a.effective_from));
 
     TAIPOWER_RATES = loadedRates;
-    console.log(`✅ 成功載入 ${TAIPOWER_RATES.length} 個歷史電價版本`);
+    logger.info(`✅ 成功載入 ${TAIPOWER_RATES.length} 個歷史電價版本`);
   } catch (error) {
-    console.error('❌ 載入電價版本失敗:', error);
+    logger.error('❌ 載入電價版本失敗:', error);
     // 保留空陣列，讓後續邏輯可以偵測到錯誤
     TAIPOWER_RATES = [];
   }
@@ -122,7 +123,7 @@ loadAllPricingVersions();
 function getRateVersion(periodEndStr) {
   // 檢查電價資料是否已載入
   if (TAIPOWER_RATES.length === 0) {
-    console.warn('電價資料尚未載入完成，請稍後再試');
+    logger.warn('電價資料尚未載入完成，請稍後再試');
     throw new Error('電價資料尚未載入完成');
   }
 
@@ -309,7 +310,7 @@ export function reverseBillToKwh(billAmount, startDate, endDate) {
     const kwh = findKwhFromBill(billAmount, startDate, endDate);
     return Math.round(kwh * 10) / 10;
   } catch (error) {
-    console.error("Error in reverseBillToKwh:", error);
+    logger.error("Error in reverseBillToKwh:", error);
     return 0; // Return 0 on error
   }
 }

@@ -70,7 +70,7 @@ export function migrateHistoryOnStartup(historyStore) {
     }
 
   } catch (error) {
-    console.error('[Migration] Migration failed:', error)
+    logger.error('[Migration] Migration failed:', error)
     // 不阻止應用啟動
   }
 }

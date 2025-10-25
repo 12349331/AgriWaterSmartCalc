@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
+import logger from '@/utils/logger'
 
 // Import Tailwind CSS
 import './assets/styles/main.css'
@@ -21,6 +22,9 @@ import './config/echarts'
 // Import performance monitoring
 import { usePerformance } from './composables/usePerformance'
 
+// Import data migration utility
+import { migrateHistoryOnStartup } from './utils/migrate-history'
+
 // Initialize performance monitoring
 const performance = usePerformance()
 performance.init()
@@ -31,14 +35,13 @@ const app = createApp(App)
 app.use(createPinia())
 
 // Run data migration on startup (T023)
-import { migrateHistoryOnStartup } from './utils/migrate-history'
 try {
   const migratedCount = migrateHistoryOnStartup()
   if (migratedCount > 0) {
   } else {
   }
 } catch (error) {
-  console.error('[AquaMetrics Migration] Error during data migration:', error)
+  logger.error('[AquaMetrics Migration] Error during data migration:', error)
 }
 
 // Mount app

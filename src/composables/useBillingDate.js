@@ -1,4 +1,5 @@
 import { ref, computed, watch } from 'vue'
+import logger from '@/utils/logger'
 import { determineBillingSeason, isBoundaryDate } from '@/utils/billing-seasons'
 import { isFutureDate, isWithinRange, MIN_ALLOWED_DATE, getMaxAllowedDate } from '@/utils/date-validators'
 
@@ -19,7 +20,7 @@ export function useBillingDate(initialDate = null) {
     try {
       return determineBillingSeason(billingDate.value)
     } catch (error) {
-      console.error('[useBillingDate] Failed to determine season:', error)
+      logger.error('[useBillingDate] Failed to determine season:', error)
       return null
     }
   })
