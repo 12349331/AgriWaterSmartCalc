@@ -8,6 +8,13 @@ import './assets/styles/main.css'
 // Import Vant theme customization
 import './assets/styles/vant-theme.css'
 
+// Import Vant Locale and Traditional Chinese language pack
+import { Locale } from 'vant'
+import zhTW from 'vant/es/locale/lang/zh-TW'
+
+// Configure Vant to use Traditional Chinese
+Locale.use('zh-TW', zhTW)
+
 // Import ECharts configuration (tree-shaking)
 import './config/echarts'
 

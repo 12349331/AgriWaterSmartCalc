@@ -60,7 +60,7 @@
           v-if="billingPeriodStart && billingPeriodEnd && !periodValidationError"
           class="mt-2 flex items-center gap-2"
         >
-          <span class="text-sm font-medium text-gray-700">計價季節：</span>
+          <span class="text-sm font-medium text-gray-700">主要季節：</span>
           <span
             data-testid="billing-season-badge"
             :class="[
@@ -72,7 +72,7 @@
           >
             {{ determinedSeason }}
           </span>
-          <span class="text-xs text-gray-500">(自動判定)</span>
+          <span class="text-xs text-gray-500">(混合計算,以天數較多者標示)</span>
         </div>
 
         <!-- Screen reader live region for season changes -->
@@ -80,7 +80,7 @@
           aria-live="polite"
           class="sr-only"
         >
-          當前計價季節：{{ determinedSeason }}
+          主要季節：{{ determinedSeason }}（系統將按天數比例混合計算夏月與非夏月費率）
         </div>
       </div>
 

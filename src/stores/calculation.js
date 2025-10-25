@@ -50,6 +50,20 @@ export const useCalculationStore = defineStore('calculation', () => {
   const isCrossVersion = ref(false) // 是否橫跨多個版本
   const crossVersionBreakdown = ref([]) // 跨版本拆分詳情
 
+  // NEW: Verification information (計算結果驗證資訊)
+  const verificationInfo = ref({
+    billCheck: 0, // 反推驗證的電費金額
+    accuracy: 0, // 精確度（誤差值）
+    iterations: 0, // 二分搜尋迭代次數
+    billingDaysSummary: '', // 計費天數摘要
+    pricingVersionUsed: '', // 使用的電價版本
+    seasonalSplit: null, // 季節天數分布
+  })
+
+  // NEW: Calculation formula (計算公式)
+  const calculationFormula = ref('')
+  const detailedBreakdown = ref(null)
+
   // NEW: Dirty state tracking
   const initialState = ref(null)
   const isDirty = ref(false)
@@ -58,25 +72,17 @@ export const useCalculationStore = defineStore('calculation', () => {
 
   // Getters (Computed Properties)
   const calculatedKwh = computed(() => {
-    if (!billAmount.value) {
+    // If the essential parameters for the new algorithm are not available, return 0.
+    if (!billAmount.value || !billingPeriodStart.value || !billingPeriodEnd.value) {
       return 0
     }
 
-    // Check if pricing data exists (support both old array format and new object format)
-    const hasPricingData = taipowerPricing.value &&
-      (Array.isArray(taipowerPricing.value) ? taipowerPricing.value.length > 0 : taipowerPricing.value.pricing_types?.length > 0)
-
-    if (!hasPricingData) {
-      // Fallback calculation if no API data
-      return billAmount.value / 3.5
-    }
-
-    // Use simple calculation for computed (actual cross-version calculation happens in calculate())
+    // Directly call the new, self-contained reverseBillToKwh function.
+    // It no longer depends on externally passed pricing data or season.
     return reverseBillToKwh(
       billAmount.value,
-      electricityType.value,
-      billingSeason.value,
-      taipowerPricing.value,
+      billingPeriodStart.value,
+      billingPeriodEnd.value
     )
   })
 
@@ -402,6 +408,31 @@ export const useCalculationStore = defineStore('calculation', () => {
         isCrossVersion.value = crossVersionResult.isCrossVersion
         crossVersionBreakdown.value = crossVersionResult.breakdown || []
 
+        // 更新驗證資訊
+        if (crossVersionResult.verification) {
+          const verification = crossVersionResult.verification
+
+          // 建立計費天數摘要
+          let billingDaysSummary = ''
+          if (verification.seasonalSplit) {
+            const { summerDays, nonSummerDays, totalDays } = verification.seasonalSplit
+            billingDaysSummary = `共 ${totalDays} 天 (夏月 ${summerDays} 天 / 非夏月 ${nonSummerDays} 天)`
+          }
+
+          verificationInfo.value = {
+            billCheck: verification.billCheck || 0,
+            accuracy: verification.accuracy || 0,
+            iterations: verification.iterations || 0,
+            billingDaysSummary,
+            pricingVersionUsed: crossVersionResult.version || '',
+            seasonalSplit: verification.seasonalSplit,
+          }
+        }
+
+        // 更新計算公式和詳細分解
+        calculationFormula.value = crossVersionResult.calculationFormula || ''
+        detailedBreakdown.value = crossVersionResult.detailedBreakdown || null
+
         if (crossVersionResult.isCrossVersion) {
           versionInfo = {
             isCrossVersion: true,
@@ -531,6 +562,11 @@ export const useCalculationStore = defineStore('calculation', () => {
     currentPricingVersion,
     isCrossVersion,
     crossVersionBreakdown,
+    // NEW: Verification State
+    verificationInfo,
+    // NEW: Calculation Formula State
+    calculationFormula,
+    detailedBreakdown,
     // NEW: Dirty State
     isDirty,
     dirtyFields,

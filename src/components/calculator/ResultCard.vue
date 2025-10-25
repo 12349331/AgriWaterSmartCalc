@@ -31,6 +31,61 @@
         <div class="text-2xl font-bold text-primary">
           {{ formatKwh(calculatedKwh) }}
         </div>
+
+        <!-- Calculation Verification (NEW) -->
+        <div
+          v-if="verificationInfo && verificationInfo.billCheck > 0"
+          class="mt-3 p-3 bg-gray-50 rounded-lg text-xs text-gray-600 space-y-1"
+        >
+          <p class="flex items-center">
+            <span class="mr-2">✓</span>
+            <span>適用電價：{{ verificationInfo.pricingVersionUsed || currentPricingVersion || '使用當前版本' }}</span>
+          </p>
+          <p
+            v-if="verificationInfo.billingDaysSummary"
+            class="flex items-center"
+          >
+            <span class="mr-2">✓</span>
+            <span>計費天數：{{ verificationInfo.billingDaysSummary }}</span>
+          </p>
+          <p class="flex items-center">
+            <span class="mr-2">✓</span>
+            <span>驗證電費：{{ formatKwh(calculatedKwh) }} 度 算得電費為 {{ formatCurrency(verificationInfo.billCheck) }}</span>
+          </p>
+          <p
+            v-if="verificationInfo.accuracy !== undefined && verificationInfo.accuracy < 0.01"
+            class="flex items-center text-green-600"
+          >
+            <span class="mr-2">✓</span>
+            <span>精確度：誤差 &lt; 0.01 元（{{ verificationInfo.iterations }} 次迭代）</span>
+          </p>
+        </div>
+
+        <!-- Calculation Formula Display -->
+        <div
+          v-if="calculationFormula"
+          class="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg"
+        >
+          <div class="text-xs font-medium text-gray-700 mb-2">
+            📊 詳細計算公式（混合季節費率）
+          </div>
+          <div class="text-xs font-mono text-gray-800 whitespace-normal break-words pb-2">
+            {{ calculationFormula }}
+          </div>
+          <div
+            v-if="detailedBreakdown && detailedBreakdown.summerDays > 0 && detailedBreakdown.nonSummerDays > 0"
+            class="text-xs text-gray-600 mt-2 space-y-1"
+          >
+            <p class="flex items-center">
+              <span class="mr-2">🌞</span>
+              <span>夏月 {{ detailedBreakdown.summerDays }} 天 ({{ Math.round(detailedBreakdown.summerDays / detailedBreakdown.totalDays * 100) }}%)</span>
+            </p>
+            <p class="flex items-center">
+              <span class="mr-2">❄️</span>
+              <span>非夏月 {{ detailedBreakdown.nonSummerDays }} 天 ({{ Math.round(detailedBreakdown.nonSummerDays / detailedBreakdown.totalDays * 100) }}%)</span>
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Water Flow Rate (Q) -->
@@ -221,6 +276,25 @@ defineProps({
   crossVersionBreakdown: {
     type: Array,
     default: () => [],
+  },
+  verificationInfo: {
+    type: Object,
+    default: () => ({
+      billCheck: 0,
+      accuracy: 0,
+      iterations: 0,
+      billingDaysSummary: '',
+      pricingVersionUsed: '',
+      seasonalSplit: null,
+    }),
+  },
+  calculationFormula: {
+    type: String,
+    default: '',
+  },
+  detailedBreakdown: {
+    type: Object,
+    default: null,
   },
 })
 

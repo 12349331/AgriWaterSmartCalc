@@ -108,7 +108,7 @@
           clip-rule="evenodd"
         />
       </svg>
-      <span>此計費期間橫跨夏月與非夏月邊界，系統已自動判定為「{{ determinedSeason }}」（以天數較多者為準）。</span>
+      <span>此計費期間橫跨夏月與非夏月邊界，系統將按天數比例混合計算兩個季節的費率。顯示季節「{{ determinedSeason }}」僅供參考（以天數較多者為準）。</span>
     </div>
 
     <!-- Long Period Warning -->

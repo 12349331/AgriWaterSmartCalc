@@ -1,247 +1,390 @@
 /**
- * Power Calculator Composable
- * 電力計算器組合式函式
- * Reverse-calculates kWh from Taipower bill amount using progressive pricing
- * 根據台電帳單金額反推用電度數（使用累進費率）
- */
-
-import { usePricingVersion } from './usePricingVersion.js'
-import { determineBillingSeason } from '../utils/billing-seasons.js'
-
-/**
- * 從新格式的電價資料中提取指定類型和季節的級距
- * @param {Object} pricingData - 新格式的電價資料（包含 pricing_types）
- * @param {string} electricityType - 用電種類
- * @param {string} billingSeason - 計費月份（夏月或非夏月）
- * @returns {Array} 級距陣列
- */
-function extractTiers(pricingData, electricityType, billingSeason) {
-  // 支援新格式（包含 pricing_types）
-  if (pricingData.pricing_types) {
-    const typeData = pricingData.pricing_types.find((t) => t.用電種類 === electricityType)
-    if (!typeData) return []
-
-    const seasonData = typeData.seasons.find((s) => s.計費月份 === billingSeason)
-    return seasonData ? seasonData.tiers : []
-  }
-
-  // 支援舊格式（陣列格式，用於向後相容）
-  if (Array.isArray(pricingData)) {
-    return pricingData.filter(
-      (p) => p.用電種類 === electricityType && p.計費月份 === billingSeason,
-    )
-  }
-
-  return []
-}
-
-/**
- * 計算單一級距的度數寬度
- * @param {Object} tier - 級距物件
- * @param {number} previousMax - 前一級距的上限度數
- * @returns {number|null} 該級距的度數寬度
- */
-function calculateTierWidth(tier, previousMax = 0) {
-  // 新格式：直接使用 上限度數 欄位
-  if (tier.上限度數 !== undefined) {
-    if (tier.上限度數 === null) {
-      // 開放級距（如 1001度以上），回傳 null 表示無上限
-      return null
-    }
-    // 級距寬度 = 上限 - 前一級距上限
-    return tier.上限度數 - previousMax
-  }
-
-  // 舊格式：解析級距字串（向後相容）
-  return parseTierLimitLegacy(tier.級距)
-}
-
-/**
- * Reverse calculate kWh from bill amount using Taipower progressive pricing
- * 根據台電帳單金額反推用電度數（使用累進費率）
+ * Power Calculator Composable (NEW ALGORITHM)
+ * 電力計算器組合式函式 (新演算法)
  *
- * @param {number} billAmount - Bill amount in TWD / 帳單金額（新台幣）
- * @param {string} electricityType - Electricity type (e.g., "表燈非營業用") / 用電種類
- * @param {string} billingSeason - "夏月" or "非夏月" / 計費月份（夏月或非夏月）
- * @param {Object|Array} pricingData - Taipower pricing data / 台電費率資料
- * @returns {number} Calculated kWh / 計算出的用電度數
+ * Implements a more accurate reverse calculation for Taipower bills by:
+ * 1. Using a binary search approach (`findKwhFromBill`).
+ * 2. Converting monthly tiers to bimonthly tiers to match billing cycles.
+ * 3. Correctly blending summer and non-summer rates based on the proportion of days in the billing period.
+ *
+ * This logic is based on the validated algorithm from `test.html`.
  */
-export function reverseBillToKwh(
-  billAmount,
-  electricityType,
-  billingSeason,
-  pricingData,
-) {
-  // 檢查帳單金額或費率資料是否存在
-  if (!billAmount || !pricingData) return 0
 
-  // 提取對應的級距資料
-  const tiers = extractTiers(pricingData, electricityType, billingSeason)
+// Import pricing versions metadata
+import versionsData from '@/data/pricing/versions.json';
 
-  if (tiers.length === 0) {
-    // 若找不到對應的費率級距，使用簡化計算方式
-    console.warn(`找不到電價資料：${electricityType} ${billingSeason}`)
-    return billAmount / 3.5 // Fallback: ~3.5 TWD/kWh average
-  }
+// 使用 Vite 的 import.meta.glob 預先載入所有 JSON 檔案
+const pricingModules = import.meta.glob('@/data/pricing/*.json', { eager: true });
 
-  // 初始化總度數和剩餘金額
-  let totalKwh = 0
-  let remainingBill = billAmount
-  let previousMax = 0
-
-  // 逐層級計算：從最低級距開始，依次消耗剩餘金額
-  for (const tier of tiers) {
-    // 取得該級距的度數寬度和單價
-    const tierWidth = calculateTierWidth(tier, previousMax)
-    const unitPrice = parseFloat(tier.單價)
-
-    // 若單價解析失敗，跳過該層級
-    if (!unitPrice) continue
-
-    // 處理開放級距（上限度數 為 null）
-    if (tierWidth === null) {
-      // 最高級距，直接用剩餘金額 ÷ 單價計算度數
-      totalKwh += remainingBill / unitPrice
-      break
-    }
-
-    // 計算該層級的費用（度數 × 單價）
-    const tierCost = unitPrice * tierWidth
-
-    // 若剩餘金額不足該層級的費用，表示用電度數位於此層級內
-    if (remainingBill <= tierCost) {
-      // 直接用剩餘金額 ÷ 單價 計算該層級的度數
-      totalKwh += remainingBill / unitPrice
-      break // 計算完成，跳出迴圈
-    }
-
-    // 若剩餘金額足夠，該層級全額消耗
-    totalKwh += tierWidth
-    remainingBill -= tierCost
-    previousMax = tier.上限度數 || previousMax
-  }
-
-  // 四捨五入到小數點一位
-  return Math.round(totalKwh * 10) / 10
-}
+// --- 電價資料庫 (動態載入) ---
+// 將在初始化時從 JSON 檔案載入所有歷史版本
+let TAIPOWER_RATES = [];
 
 /**
- * 跨版本反推用電度數（按比例拆分計費期間）
- * @param {number} billAmount - 電費金額
- * @param {string} electricityType - 用電種類
- * @param {Date|string} startDate - 計費起始日
- * @param {Date|string} endDate - 計費結束日
- * @returns {Promise<Object>} 計算結果（包含總度數、是否跨版本、詳細拆分）
+ * 將 JSON 格式的電價資料轉換為計算所需的簡化格式
+ * @param {Object} jsonData - JSON 格式的電價資料
+ * @returns {Object} 簡化格式的電價資料
  */
-export async function reverseBillToKwhCrossVersion(
-  billAmount,
-  electricityType,
-  startDate,
-  endDate,
-) {
-  const { checkCrossVersion, splitBillingPeriod, loadPricingData } = usePricingVersion()
+function convertJSONToPricingFormat(jsonData) {
+  // 找出「表燈非營業用」的定價類型
+  const targetType = jsonData.pricing_types?.find(
+    pt => pt.用電種類 === '表燈非營業用'
+  );
 
-  // 檢查是否橫跨版本
-  if (!checkCrossVersion(startDate, endDate)) {
-    // 單一版本，直接計算
-    const { findVersionByDate } = usePricingVersion()
-    const version = findVersionByDate(endDate)
-
-    if (!version) {
-      console.error('找不到適用的電價版本')
-      return { totalKwh: 0, isCrossVersion: false }
-    }
-
-    const pricingData = await loadPricingData(version.version_id)
-    const season = determineBillingSeason(startDate, endDate)
-    const kwh = reverseBillToKwh(billAmount, electricityType, season, pricingData)
-
-    return {
-      totalKwh: kwh,
-      isCrossVersion: false,
-      version: version.version_id,
-      season,
-    }
+  if (!targetType) {
+    console.warn('找不到「表燈非營業用」電價資料');
+    return null;
   }
 
-  // 橫跨多版本，按比例拆分
-  const periods = splitBillingPeriod(startDate, endDate)
-  const totalDays = periods.reduce((sum, p) => sum + p.days, 0)
+  // 找出夏月和非夏月的級距資料
+  const summerSeason = targetType.seasons.find(s => s.計費月份 === '夏月');
+  const nonSummerSeason = targetType.seasons.find(s => s.計費月份 === '非夏月');
 
-  let totalKwh = 0
-  const breakdown = []
-
-  for (const period of periods) {
-    // 按天數比例拆分電費
-    const periodBill = billAmount * (period.days / totalDays)
-
-    // 載入該期間適用的電價
-    const pricingData = await loadPricingData(period.version_id)
-
-    // 判定該期間的季節
-    const season = determineBillingSeason(period.start, period.end)
-
-    // 計算該期間的度數
-    const kwh = reverseBillToKwh(periodBill, electricityType, season, pricingData)
-
-    totalKwh += kwh
-    breakdown.push({
-      version: period.version_id,
-      start: period.start,
-      end: period.end,
-      days: period.days,
-      bill: periodBill,
-      kwh: kwh,
-      season: season,
-    })
+  if (!summerSeason || !nonSummerSeason) {
+    console.warn('找不到季節級距資料');
+    return null;
   }
+
+  // 轉換級距格式
+  const convertTiers = (tiers) => {
+    return tiers.map(tier => ({
+      limit: tier.上限度數 || Infinity,
+      rate: tier.單價
+    }));
+  };
 
   return {
-    totalKwh: Math.round(totalKwh * 10) / 10,
-    isCrossVersion: true,
-    breakdown,
-  }
+    version: jsonData.description || jsonData.version,
+    effective_from: jsonData.effective_from,
+    effective_to: jsonData.effective_to || '9999-12-31',
+    type: '表燈非營業用',
+    summer: convertTiers(summerSeason.tiers),
+    non_summer: convertTiers(nonSummerSeason.tiers),
+  };
 }
 
 /**
- * Parse tier limit string to number (Legacy format support)
- * 解析級距字串，轉換為度數範圍（舊格式支援）
- * Examples: "120度以下" → 120, "121-330度" → 210, "331-500度" → 170
+ * 載入所有歷史電價版本
+ * 使用 Vite 預先載入的模組
  */
-function parseTierLimitLegacy(tierString) {
-  if (!tierString) return null
+function loadAllPricingVersions() {
+  try {
+    // Debug: 顯示所有可用的模組路徑
+    console.log('可用的定價模組:', Object.keys(pricingModules));
 
-  // 處理「XX度以下」的格式
-  if (tierString.includes('以下')) {
-    const match = tierString.match(/(\d+)度以下/)
-    return match ? parseInt(match[1]) : null
+    const versions = versionsData.versions;
+    const loadedRates = [];
+
+    for (const versionInfo of versions) {
+      try {
+        // 從預先載入的模組中獲取資料
+        const modulePath = `/src/data/pricing/${versionInfo.file}`;
+        const jsonModule = pricingModules[modulePath];
+
+        if (!jsonModule) {
+          console.warn(`找不到模組: ${modulePath}`);
+          console.warn('嘗試的路徑:', modulePath);
+          continue;
+        }
+
+        const jsonData = jsonModule.default;
+
+        // 轉換格式
+        const converted = convertJSONToPricingFormat(jsonData);
+        if (converted) {
+          loadedRates.push(converted);
+        }
+      } catch (error) {
+        console.warn(`無法載入電價版本 ${versionInfo.file}:`, error);
+      }
+    }
+
+    // 按生效日期排序（最新的在前面）
+    loadedRates.sort((a, b) => new Date(b.effective_from) - new Date(a.effective_from));
+
+    TAIPOWER_RATES = loadedRates;
+    console.log(`✅ 成功載入 ${TAIPOWER_RATES.length} 個歷史電價版本`);
+  } catch (error) {
+    console.error('❌ 載入電價版本失敗:', error);
+    // 保留空陣列，讓後續邏輯可以偵測到錯誤
+    TAIPOWER_RATES = [];
+  }
+}
+
+// 立即初始化（同步執行）
+loadAllPricingVersions();
+
+// --- Helper Functions from the new algorithm ---
+
+/**
+ * 1. 根據「計費迄日」取得適用的電價版本
+ */
+function getRateVersion(periodEndStr) {
+  // 檢查電價資料是否已載入
+  if (TAIPOWER_RATES.length === 0) {
+    console.warn('電價資料尚未載入完成，請稍後再試');
+    throw new Error('電價資料尚未載入完成');
   }
 
-  // 處理「XX-YY度」的格式
-  if (tierString.includes('-')) {
-    const match = tierString.match(/(\d+)-(\d+)度/)
-    if (match) {
-      const lower = parseInt(match[1])
-      const upper = parseInt(match[2])
-      return upper - lower + 1
+  const endDate = new Date(periodEndStr);
+  for (const version of TAIPOWER_RATES) {
+    const from = new Date(version.effective_from);
+    const to = new Date(version.effective_to);
+    if (endDate >= from && endDate <= to) {
+      return version;
     }
   }
 
-  // 處理「XX度以上」的格式 - 回傳 null 表示開放級距
-  if (tierString.includes('以上')) {
-    return null // 開放級距，無上限
-  }
-
-  return null
+  // 提供更詳細的錯誤訊息
+  const availableRange = TAIPOWER_RATES.length > 0
+    ? `(可用範圍: ${TAIPOWER_RATES[TAIPOWER_RATES.length - 1].effective_from} ~ ${TAIPOWER_RATES[0].effective_to})`
+    : '';
+  throw new Error(`找不到適用於 ${periodEndStr} 的電價版本 ${availableRange}`);
 }
 
 /**
- * Composable hook for power calculation
- * 電力計算組合式函式
+ * 2. 將「每月」級距轉換為「雙月」級距的度數 *寬度*
+ */
+function getBimonthlyTiers(monthlyTiers) {
+  let bimonthlyTiers = [];
+  let lastLimit = 0;
+  for (const tier of monthlyTiers) {
+    // The width of the tier (e.g., 330 - 120 = 210) is doubled for a bimonthly period.
+    const kwhInTier = (tier.limit - lastLimit) * 2;
+    bimonthlyTiers.push({ kwh: kwhInTier, rate: tier.rate });
+    lastLimit = tier.limit;
+    if (tier.limit === Infinity) {
+      break;
+    }
+  }
+  return bimonthlyTiers;
+}
+
+/**
+ * 3. 計算夏月/非夏月天數
+ */
+function getSeasonalSplit(periodStartStr, periodEndStr) {
+  const startDate = new Date(periodStartStr);
+  const endDate = new Date(periodEndStr);
+
+  let summerDays = 0;
+  let nonSummerDays = 0;
+  let totalDays = 0;
+
+  let currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const year = currentDate.getFullYear();
+    // Summer months are June (5) to September (8)
+    const summerStart = new Date(year, 5, 1);
+    const summerEnd = new Date(year, 8, 30, 23, 59, 59);
+
+    if (currentDate >= summerStart && currentDate <= summerEnd) {
+      summerDays++;
+    } else {
+      nonSummerDays++;
+    }
+    totalDays++;
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return { summerDays, nonSummerDays, totalDays };
+}
+
+/**
+ * 4. [正向計算] 根據用電度數和期間，計算流動電費
+ * 可選返回詳細分解資訊
+ */
+function calculateBillFromKwh(totalKwh, periodStartStr, periodEndStr, returnBreakdown = false) {
+  const rateVersion = getRateVersion(periodEndStr);
+  const { summerDays, nonSummerDays, totalDays } = getSeasonalSplit(periodStartStr, periodEndStr);
+  if (totalDays === 0) return returnBreakdown ? { bill: 0, breakdown: [] } : 0;
+
+  const summerTiers = getBimonthlyTiers(rateVersion.summer);
+  const nonSummerTiers = getBimonthlyTiers(rateVersion.non_summer);
+
+  // 夏月計算 (含詳細記錄)
+  let totalSummerCost = 0;
+  let kwhRemainingSummer = totalKwh;
+  const summerBreakdown = [];
+
+  for (const tier of summerTiers) {
+    const kwhInThisTier = Math.min(kwhRemainingSummer, tier.kwh);
+    if (kwhInThisTier > 0) {
+      const cost = kwhInThisTier * tier.rate;
+      totalSummerCost += cost;
+      summerBreakdown.push({
+        rate: tier.rate,
+        kwh: kwhInThisTier,
+        cost: cost,
+        days: summerDays,
+        totalDays: totalDays,
+      });
+    }
+    kwhRemainingSummer -= kwhInThisTier;
+    if (kwhRemainingSummer <= 0) break;
+  }
+
+  // 非夏月計算 (含詳細記錄)
+  let totalNonSummerCost = 0;
+  let kwhRemainingNonSummer = totalKwh;
+  const nonSummerBreakdown = [];
+
+  for (const tier of nonSummerTiers) {
+    const kwhInThisTier = Math.min(kwhRemainingNonSummer, tier.kwh);
+    if (kwhInThisTier > 0) {
+      const cost = kwhInThisTier * tier.rate;
+      totalNonSummerCost += cost;
+      nonSummerBreakdown.push({
+        rate: tier.rate,
+        kwh: kwhInThisTier,
+        cost: cost,
+        days: nonSummerDays,
+        totalDays: totalDays,
+      });
+    }
+    kwhRemainingNonSummer -= kwhInThisTier;
+    if (kwhRemainingNonSummer <= 0) break;
+  }
+
+  const finalBill = (totalSummerCost * summerDays / totalDays) + (totalNonSummerCost * nonSummerDays / totalDays);
+
+  if (returnBreakdown) {
+    return {
+      bill: finalBill,
+      totalKwh: totalKwh,
+      summerDays,
+      nonSummerDays,
+      totalDays,
+      summerBreakdown,
+      nonSummerBreakdown,
+      rateVersion: rateVersion.version,
+    };
+  }
+
+  return finalBill;
+}
+
+/**
+ * 5. [反向推算] 根據流動電費和期間，找出用電度數 (二分搜尋法)
+ */
+function findKwhFromBill(targetBill, periodStartStr, periodEndStr) {
+  let minKwh = 0;
+  let maxKwh = 20000; // A reasonable upper limit
+  let estimatedKwh = 0;
+  const precision = 0.01; // Target precision of 1 cent
+  const maxIterations = 100; // Safety break
+
+  for (let i = 0; i < maxIterations; i++) {
+    estimatedKwh = (minKwh + maxKwh) / 2;
+    const calculatedBill = calculateBillFromKwh(estimatedKwh, periodStartStr, periodEndStr);
+    const difference = calculatedBill - targetBill;
+
+    if (Math.abs(difference) < precision) {
+      return estimatedKwh; // Found a close enough match
+    }
+
+    if (difference < 0) {
+      minKwh = estimatedKwh; // Calculated bill is too low, need more kWh
+    } else {
+      maxKwh = estimatedKwh; // Calculated bill is too high, need less kWh
+    }
+  }
+
+  return estimatedKwh; // Return the best estimate after max iterations
+}
+
+
+// --- Exports for the composable ---
+
+/**
+ * Reverse calculate kWh from bill amount using the new, accurate algorithm.
+ * Note: The parameters `electricityType` and `billingSeason` are implicitly handled
+ * by the new algorithm which uses hardcoded "表燈非營業用" rates and calculates
+ * seasonal splits internally.
+ */
+export function reverseBillToKwh(billAmount, startDate, endDate) {
+  if (!billAmount || !startDate || !endDate) return 0;
+
+  try {
+    const kwh = findKwhFromBill(billAmount, startDate, endDate);
+    return Math.round(kwh * 10) / 10;
+  } catch (error) {
+    console.error("Error in reverseBillToKwh:", error);
+    return 0; // Return 0 on error
+  }
+}
+
+/**
+ * This function is kept for API compatibility.
+ * The new algorithm determines the rate version based on the end date and does not
+ * handle splitting across multiple *rate versions* (e.g., 2024 vs 2025 rates),
+ * but it correctly handles splitting *seasons* within a single version.
+ */
+export async function reverseBillToKwhCrossVersion(billAmount, electricityType, startDate, endDate) {
+    const kwh = reverseBillToKwh(billAmount, startDate, endDate);
+
+    // 獲取詳細的計算分解資訊
+    const detailedBreakdown = calculateBillFromKwh(kwh, startDate, endDate, true);
+
+    // 生成計算公式字串
+    const formula = generateFormulaString(detailedBreakdown);
+
+    // 返回詳細結果
+    return {
+        totalKwh: kwh,
+        isCrossVersion: false, // Seasons are always blended
+        breakdown: [],
+        version: detailedBreakdown.rateVersion,
+        verification: {
+            billCheck: detailedBreakdown.bill,
+            accuracy: Math.abs(detailedBreakdown.bill - billAmount),
+            iterations: 0, // Binary search iterations (not tracked here)
+            seasonalSplit: {
+                summerDays: detailedBreakdown.summerDays,
+                nonSummerDays: detailedBreakdown.nonSummerDays,
+                totalDays: detailedBreakdown.totalDays,
+            },
+        },
+        calculationFormula: formula,
+        detailedBreakdown: detailedBreakdown,
+    };
+}
+
+/**
+ * 生成計算公式字串
+ * 格式: 5137.1 = 1.68x240(45/61) + 2.45x420(45/61) + ... + 1.68x240(16/61) + ...
+ */
+function generateFormulaString(breakdown) {
+    if (!breakdown || !breakdown.summerBreakdown) {
+        return '';
+    }
+
+    const { bill, summerBreakdown, nonSummerBreakdown, summerDays, nonSummerDays, totalDays } = breakdown;
+
+    let parts = [];
+
+    // 夏月各級距
+    for (const tier of summerBreakdown) {
+        parts.push(`${tier.rate}×${Math.round(tier.kwh)}(${summerDays}/${totalDays})`);
+    }
+
+    // 非夏月各級距
+    for (const tier of nonSummerBreakdown) {
+        parts.push(`${tier.rate}×${Math.round(tier.kwh)}(${nonSummerDays}/${totalDays})`);
+    }
+
+    return `${bill.toFixed(1)} = ${parts.join(' + ')}`;
+}
+
+
+/**
+ * Composable hook for the new power calculation logic.
  */
 export function usePowerCalculator() {
+  // The main function now requires start and end dates.
+  // The store (`useCalculationStore`) will be responsible for passing these dates.
   return {
     reverseBillToKwh,
     reverseBillToKwhCrossVersion,
-  }
+  };
 }

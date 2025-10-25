@@ -62,6 +62,9 @@
             :current-pricing-version="calculationStore.currentPricingVersion"
             :is-cross-version="calculationStore.isCrossVersion"
             :cross-version-breakdown="calculationStore.crossVersionBreakdown"
+            :verification-info="calculationStore.verificationInfo"
+            :calculation-formula="calculationStore.calculationFormula"
+            :detailed-breakdown="calculationStore.detailedBreakdown"
             @save="handleSaveRecord"
             @share="handleShare"
           />
