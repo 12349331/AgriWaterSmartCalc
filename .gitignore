@@ -24,3 +24,5 @@ playwright-report/
 # Keep essential docs
 !README.md
 !CLAUDE.md
+\n# Ignored documentation files\nAGENTS.md\nCLAUDE.md\nGEMINI.md\nDESIGN_IMPROVEMENTS.md
+\n# Local AI agent configurations\n.gemini/\n.specify/
