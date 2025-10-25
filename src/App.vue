@@ -59,6 +59,9 @@
             :is-over-extraction="calculationStore.isOverExtraction"
             :loading="uiStore.isLoading"
             :data-source="calculationStore.pricingDataSource"
+            :current-pricing-version="calculationStore.currentPricingVersion"
+            :is-cross-version="calculationStore.isCrossVersion"
+            :cross-version-breakdown="calculationStore.crossVersionBreakdown"
             @save="handleSaveRecord"
             @share="handleShare"
           />
@@ -226,7 +229,7 @@ const uiStore = useUiStore()
 const formData = ref({})
 const pumpParams = ref({
   horsepower: 5.0,
-  efficiency: 0.75,
+  efficiency: 0.45,
   wellDepth: 30.0,
 })
 
@@ -254,11 +257,11 @@ const handleCalculate = async (data) => {
     // Fetch Taipower pricing (with automatic fallback)
     await calculationStore.fetchTaipowerPricing()
 
-    // Update form data in store
-    calculationStore.setFormData(data)
-
-    // Update pump params
+    // Update pump params first
     calculationStore.setPumpParams(pumpParams.value)
+
+    // Perform calculation (now async to support cross-version calculation)
+    await calculationStore.calculate(data)
 
     uiStore.setSuccess('計算完成')
   } catch (error) {

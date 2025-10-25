@@ -76,6 +76,61 @@
         </div>
       </div>
 
+      <!-- Pricing Version Information -->
+      <div
+        v-if="currentPricingVersion || isCrossVersion"
+        class="mt-3 p-3 bg-blue-50 rounded-sm text-sm space-y-2"
+      >
+        <div class="flex items-start">
+          <svg
+            class="h-4 w-4 mr-2 shrink-0 text-blue-600 mt-0.5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <div class="flex-1">
+            <div
+              v-if="!isCrossVersion"
+              class="text-gray-700"
+            >
+              電價版本：<span class="font-medium">{{ currentPricingVersion }}</span>
+            </div>
+            <div
+              v-else
+              class="text-gray-700"
+            >
+              <div class="font-medium mb-2">
+                ⚡ 計費期間橫跨多個電價版本（已按比例拆分）
+              </div>
+              <div
+                v-for="(period, index) in crossVersionBreakdown"
+                :key="index"
+                class="ml-4 mt-1 text-xs space-y-1"
+              >
+                <div class="flex items-center space-x-2">
+                  <span class="font-mono bg-blue-100 px-2 py-0.5 rounded">
+                    {{ period.version }}
+                  </span>
+                  <span class="text-gray-600">
+                    {{ formatDate(period.start) }} ~ {{ formatDate(period.end) }}
+                  </span>
+                  <span class="text-gray-500">({{ period.days }} 天)</span>
+                </div>
+                <div class="ml-2 text-gray-600">
+                  電費：{{ formatCurrency(period.bill) }} → 用電：{{ formatKwh(period.kwh) }}
+                  ({{ period.season }})
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Data Source Notice -->
       <div
         v-if="dataSource && dataSource !== 'api'"
@@ -155,7 +210,35 @@ defineProps({
     type: String,
     default: '',
   },
+  currentPricingVersion: {
+    type: String,
+    default: null,
+  },
+  isCrossVersion: {
+    type: Boolean,
+    default: false,
+  },
+  crossVersionBreakdown: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const emit = defineEmits(['save', 'share'])
+
+// Helper functions for formatting
+function formatDate(dateString) {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+}
+
+function formatCurrency(amount) {
+  if (typeof amount !== 'number') return '0 元'
+  return `${amount.toFixed(0)} 元`
+}
 </script>

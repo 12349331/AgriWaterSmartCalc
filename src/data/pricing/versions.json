@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "last_updated": "2025-10-25",
+    "source": "台電公司電價表",
+    "管理說明": "電價通常 1-2 年調整一次，新增版本時更新此檔案"
+  },
+  "versions": [
+    {
+      "version_id": "2018-04-01",
+      "effective_from": "2018-04-01",
+      "effective_to": "2022-06-30",
+      "description": "107年4月1日版",
+      "調整原因": "歷史版本",
+      "is_current": false,
+      "file": "2018-04-01.json"
+    },
+    {
+      "version_id": "2022-07-01",
+      "effective_from": "2022-07-01",
+      "effective_to": "2023-03-31",
+      "description": "111年下半年",
+      "調整原因": "歷史版本",
+      "is_current": false,
+      "file": "2022-07-01.json"
+    },
+    {
+      "version_id": "2023-04-01",
+      "effective_from": "2023-04-01",
+      "effective_to": "2023-10-31",
+      "description": "112年上半年",
+      "調整原因": "歷史版本",
+      "is_current": false,
+      "file": "2023-04-01.json"
+    },
+    {
+      "version_id": "2023-11-01",
+      "effective_from": "2023-11-01",
+      "effective_to": "2024-03-31",
+      "description": "112年下半年",
+      "調整原因": "歷史版本",
+      "is_current": false,
+      "file": "2023-11-01.json"
+    },
+    {
+      "version_id": "2024-04-01",
+      "effective_from": "2024-04-01",
+      "effective_to": "2024-10-15",
+      "description": "113年上半年",
+      "調整原因": "歷史版本",
+      "is_current": false,
+      "file": "2024-04-01.json"
+    },
+    {
+      "version_id": "2024-10-16",
+      "effective_from": "2024-10-16",
+      "effective_to": "2025-09-30",
+      "description": "113年10月16日版",
+      "調整原因": "歷史版本",
+      "is_current": false,
+      "file": "2024-10-16.json"
+    },
+    {
+      "version_id": "2025-10-01",
+      "effective_from": "2025-10-01",
+      "effective_to": null,
+      "description": "114年下半年（當前版本）",
+      "調整原因": "年度調整",
+      "is_current": true,
+      "file": "2025-10-01.json"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { reverseBillToKwh } from '@/composables/usePowerCalculator'
+import { reverseBillToKwh, reverseBillToKwhCrossVersion } from '@/composables/usePowerCalculator'
 import {
   calculateWaterFlowRate,
   calculateMonthlyVolume,
@@ -9,6 +9,7 @@ import { getTaipowerPricingData, normalizeTaipowerData } from '@/data/taipowerDa
 import { fallbackPricingData } from '@/data/taipowerFallback'
 import { determineBillingSeason, checkCrossSeasonBoundary } from '@/utils/billing-seasons'
 import { isWithinRange, isFutureDate, MIN_ALLOWED_DATE, getMaxAllowedDate } from '@/utils/date-validators'
+import { usePricingVersion } from '@/composables/usePricingVersion'
 
 export const useCalculationStore = defineStore('calculation', () => {
   // State - Step 1: User Inputs (Bill Analysis)
@@ -44,6 +45,11 @@ export const useCalculationStore = defineStore('calculation', () => {
   const hasCalculated = ref(false)
   const pricingDataSource = ref('') // 'api' | 'local' | 'cache' | 'fallback'
 
+  // NEW: Pricing version information
+  const currentPricingVersion = ref(null) // 當前使用的電價版本 ID
+  const isCrossVersion = ref(false) // 是否橫跨多個版本
+  const crossVersionBreakdown = ref([]) // 跨版本拆分詳情
+
   // NEW: Dirty state tracking
   const initialState = ref(null)
   const isDirty = ref(false)
@@ -52,11 +58,20 @@ export const useCalculationStore = defineStore('calculation', () => {
 
   // Getters (Computed Properties)
   const calculatedKwh = computed(() => {
-    if (!billAmount.value || taipowerPricing.value.length === 0) {
-      // Fallback calculation if no API data
-      return billAmount.value > 0 ? billAmount.value / 3.5 : 0
+    if (!billAmount.value) {
+      return 0
     }
 
+    // Check if pricing data exists (support both old array format and new object format)
+    const hasPricingData = taipowerPricing.value &&
+      (Array.isArray(taipowerPricing.value) ? taipowerPricing.value.length > 0 : taipowerPricing.value.pricing_types?.length > 0)
+
+    if (!hasPricingData) {
+      // Fallback calculation if no API data
+      return billAmount.value / 3.5
+    }
+
+    // Use simple calculation for computed (actual cross-version calculation happens in calculate())
     return reverseBillToKwh(
       billAmount.value,
       electricityType.value,
@@ -190,11 +205,11 @@ export const useCalculationStore = defineStore('calculation', () => {
       return normalizedData
     } catch (error) {
 
-      // **降級策略 1: 優先使用 001_updated.json 的完整資料**
+      // **降級策略 1: 優先使用最新版本的本地電價資料**
       try {
-        const localData = getTaipowerPricingData()
+        const localData = await getTaipowerPricingData()
 
-        if (localData && localData.length > 0) {
+        if (localData && (localData.pricing_types || Array.isArray(localData))) {
           taipowerPricing.value = localData
           pricingCacheTimestamp.value = Date.now()
 
@@ -208,15 +223,17 @@ export const useCalculationStore = defineStore('calculation', () => {
             Date.now().toString(),
           )
 
+          const dataCount = localData.pricing_types ? localData.pricing_types.length : localData.length
           console.log(
             '✅ 成功載入本地完整定價資料，共',
-            localData.length,
+            dataCount,
             '筆',
           )
           pricingDataSource.value = 'local'
           return localData
         }
       } catch (localError) {
+        console.warn('⚠️ 載入本地電價資料失敗:', localError)
       }
 
       // **降級策略 2: 使用 LocalStorage 快取**
@@ -357,7 +374,7 @@ export const useCalculationStore = defineStore('calculation', () => {
     return true
   }
 
-  function calculate(params) {
+  async function calculate(params) {
     // Feature 003: Support billingDate in calculation
     const calculationData = {
       ...params,
@@ -367,12 +384,66 @@ export const useCalculationStore = defineStore('calculation', () => {
 
     setFormData(calculationData)
 
+    // NEW: Check if we need cross-version calculation
+    let kwhResult = calculatedKwh.value
+    let versionInfo = {}
+
+    if (billingPeriodStart.value && billingPeriodEnd.value) {
+      // Use cross-version calculation for billing periods
+      try {
+        const crossVersionResult = await reverseBillToKwhCrossVersion(
+          billAmount.value,
+          electricityType.value,
+          billingPeriodStart.value,
+          billingPeriodEnd.value,
+        )
+
+        kwhResult = crossVersionResult.totalKwh
+        isCrossVersion.value = crossVersionResult.isCrossVersion
+        crossVersionBreakdown.value = crossVersionResult.breakdown || []
+
+        if (crossVersionResult.isCrossVersion) {
+          versionInfo = {
+            isCrossVersion: true,
+            breakdown: crossVersionResult.breakdown,
+          }
+        } else {
+          currentPricingVersion.value = crossVersionResult.version || null
+          versionInfo = {
+            isCrossVersion: false,
+            version: crossVersionResult.version,
+            season: crossVersionResult.season,
+          }
+        }
+      } catch (error) {
+        console.error('跨版本計算失敗:', error)
+        // Fallback to simple calculation
+        kwhResult = calculatedKwh.value
+      }
+    } else {
+      // Single version calculation
+      const { findVersionByDate } = usePricingVersion()
+      const version = findVersionByDate(billingDate.value)
+      currentPricingVersion.value = version?.version_id || null
+      isCrossVersion.value = false
+      crossVersionBreakdown.value = []
+
+      versionInfo = {
+        isCrossVersion: false,
+        version: currentPricingVersion.value,
+        season: computedBillingSeason.value,
+      }
+    }
+
     return {
-      kwh: calculatedKwh.value,
+      kwh: kwhResult,
       flowRate: waterFlowRate.value,
       volume: monthlyVolume.value,
       isOverExtraction: isOverExtraction.value,
-      metadata: resultMetadata.value,
+      metadata: {
+        ...resultMetadata.value,
+        ...versionInfo,
+      },
     }
   }
 
@@ -399,7 +470,7 @@ export const useCalculationStore = defineStore('calculation', () => {
   }
 
   // Initialize from LocalStorage on store creation
-  function initialize() {
+  async function initialize() {
     const cached = localStorage.getItem('aquametrics_taipower_pricing')
     const timestamp = localStorage.getItem('aquametrics_pricing_timestamp')
 
@@ -417,8 +488,8 @@ export const useCalculationStore = defineStore('calculation', () => {
 
     // 如果沒有快取或快取過期，嘗試載入本地完整資料
     try {
-      const localData = getTaipowerPricingData()
-      if (localData && localData.length > 0) {
+      const localData = await getTaipowerPricingData()
+      if (localData && (localData.pricing_types || (Array.isArray(localData) && localData.length > 0))) {
         taipowerPricing.value = localData
         pricingCacheTimestamp.value = Date.now()
         pricingDataSource.value = 'local'
@@ -456,6 +527,10 @@ export const useCalculationStore = defineStore('calculation', () => {
     // User Story P1: Billing Period State
     billingPeriodStart,
     billingPeriodEnd,
+    // NEW: Pricing Version State
+    currentPricingVersion,
+    isCrossVersion,
+    crossVersionBreakdown,
     // NEW: Dirty State
     isDirty,
     dirtyFields,
