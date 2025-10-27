@@ -29,7 +29,7 @@ export function sanitizeInput(input) {
   if (typeof input !== 'string') return input
   
   // 第一步：移除危險的標籤及其內容（script, style, iframe等）
-  let cleaned = input
+  const cleaned = input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
     .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')

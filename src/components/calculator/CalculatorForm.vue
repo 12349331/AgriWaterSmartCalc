@@ -355,11 +355,7 @@
         v-model:efficiency="localPumpParams.efficiency"
         :errors="errors"
         :warnings="warnings"
-        :efficiency-warning="efficiencyWarning"
         :disabled="disabled"
-        @keydown="handleEfficiencyKeydown"
-        @paste="handleEfficiencyPaste"
-        @blur="handleEfficiencyBlur"
       />
 
       <!-- Dirty State Notification (User Story 1) -->
@@ -438,7 +434,7 @@ import { ref, computed, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import { useCalculationStore } from '@/stores/calculation' // NEW: For dirty state tracking
 import { useValidation } from '@/composables/useValidation'
-import { useNumericInput } from '@/composables/useNumericInput' // NEW: User Story 4
+// import { useNumericInput } from '@/composables/useNumericInput' // Removed: Now using Vant Slider
 import DateRangePicker from '@/components/calculator/DateRangePicker.vue'
 import AdvancedParams from '@/components/calculator/AdvancedParams.vue'
 import { useBillingPeriod } from '@/composables/useBillingPeriod'
@@ -456,7 +452,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       horsepower: 5.0,
-      efficiency: 0.75,
+      efficiency: 0.45,
       wellDepth: 30.0,
     }),
   },
@@ -468,19 +464,7 @@ const configStore = useConfigStore()
 const calculationStore = useCalculationStore() // NEW: For dirty state tracking
 const { validateField } = useValidation()
 
-// User Story 4: Numeric input handling for pump efficiency
-const {
-  warning: efficiencyWarning,
-  handleKeydown: handleEfficiencyKeydown,
-  handlePaste: handleEfficiencyPaste,
-  handleBlur: handleEfficiencyBlur,
-  clearWarning: clearEfficiencyWarning,
-} = useNumericInput({
-  min: 0.0,
-  max: 1.0,
-  step: 0.01,
-  decimals: 2,
-})
+// Note: Numeric input handling removed - efficiency now uses Vant Slider with built-in constraints
 
 // User Story P1: Billing period management (replaces single date)
 const {
@@ -752,8 +736,6 @@ watch(
       errors.value.efficiency = result
       warnings.value.efficiency = null
     }
-    // Clear numeric input warning when validation runs
-    clearEfficiencyWarning()
   },
 )
 
@@ -920,7 +902,7 @@ function handleReset() {
   // User Story 004 & 005: Reset pump parameters to updated defaults
   localPumpParams.value = {
     horsepower: 5.0,
-    efficiency: 0.75, // Already correct
+    efficiency: 0.45, // UPDATED: Changed from 0.75 to 0.45
     wellDepth: 30.0, // UPDATED: Changed from 20 to 30
   }
 

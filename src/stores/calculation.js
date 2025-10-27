@@ -1,15 +1,29 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { reverseBillToKwh, reverseBillToKwhCrossVersion } from '@/composables/usePowerCalculator'
+import {
+  reverseBillToKwh,
+  reverseBillToKwhCrossVersion,
+} from '@/composables/usePowerCalculator'
 import logger from '@/utils/logger'
 import {
   calculateWaterFlowRate,
   calculateMonthlyVolume,
 } from '@/utils/formulas'
-import { getTaipowerPricingData, normalizeTaipowerData } from '@/data/taipowerDataConverter'
+import {
+  getTaipowerPricingData,
+  normalizeTaipowerData,
+} from '@/data/taipowerDataConverter'
 import { fallbackPricingData } from '@/data/taipowerFallback'
-import { determineBillingSeason, checkCrossSeasonBoundary } from '@/utils/billing-seasons'
-import { isWithinRange, isFutureDate, MIN_ALLOWED_DATE, getMaxAllowedDate } from '@/utils/date-validators'
+import {
+  determineBillingSeason,
+  checkCrossSeasonBoundary,
+} from '@/utils/billing-seasons'
+import {
+  isWithinRange,
+  isFutureDate,
+  MIN_ALLOWED_DATE,
+  getMaxAllowedDate,
+} from '@/utils/date-validators'
 import { usePricingVersion } from '@/composables/usePricingVersion'
 
 export const useCalculationStore = defineStore('calculation', () => {
@@ -35,7 +49,7 @@ export const useCalculationStore = defineStore('calculation', () => {
 
   // State - Advanced Parameters
   const pumpHorsepower = ref(5.0)
-  const pumpEfficiency = ref(0.75) // UPDATED: Default changed from 0.75 to 0.75 (already correct)
+  const pumpEfficiency = ref(0.45) // UPDATED: Default changed from 0.75 to 0.45 for better real-world accuracy
   const wellDepth = ref(30.0) // UPDATED: Default changed from 20.0 to 30.0
 
   // State - Taipower API Data (cached)
@@ -74,7 +88,11 @@ export const useCalculationStore = defineStore('calculation', () => {
   // Getters (Computed Properties)
   const calculatedKwh = computed(() => {
     // If the essential parameters for the new algorithm are not available, return 0.
-    if (!billAmount.value || !billingPeriodStart.value || !billingPeriodEnd.value) {
+    if (
+      !billAmount.value ||
+      !billingPeriodStart.value ||
+      !billingPeriodEnd.value
+    ) {
       return 0
     }
 
@@ -117,9 +135,11 @@ export const useCalculationStore = defineStore('calculation', () => {
     // User Story P1: Use billing period if available
     if (billingPeriodStart.value && billingPeriodEnd.value) {
       try {
-        return determineBillingSeason(billingPeriodStart.value, billingPeriodEnd.value)
-      } catch (error) {
-      }
+        return determineBillingSeason(
+          billingPeriodStart.value,
+          billingPeriodEnd.value,
+        )
+      } catch (error) {}
     }
 
     // Fallback to single billing date (Feature 003)
@@ -140,7 +160,11 @@ export const useCalculationStore = defineStore('calculation', () => {
 
   const isValidBillingDate = computed(() => {
     if (!billingDate.value) return false
-    return isWithinRange(billingDate.value, MIN_ALLOWED_DATE, getMaxAllowedDate())
+    return isWithinRange(
+      billingDate.value,
+      MIN_ALLOWED_DATE,
+      getMaxAllowedDate(),
+    )
   })
 
   // Computed properties for billing period (User Story P1)
@@ -148,7 +172,10 @@ export const useCalculationStore = defineStore('calculation', () => {
     if (!billingPeriodStart.value || !billingPeriodEnd.value) {
       return false
     }
-    return checkCrossSeasonBoundary(billingPeriodStart.value, billingPeriodEnd.value)
+    return checkCrossSeasonBoundary(
+      billingPeriodStart.value,
+      billingPeriodEnd.value,
+    )
   })
 
   // NEW: Computed properties for dirty state tracking
@@ -216,12 +243,14 @@ export const useCalculationStore = defineStore('calculation', () => {
       pricingDataSource.value = 'api'
       return normalizedData
     } catch (error) {
-
       // **降級策略 1: 優先使用最新版本的本地電價資料**
       try {
         const localData = await getTaipowerPricingData()
 
-        if (localData && (localData.pricing_types || Array.isArray(localData))) {
+        if (
+          localData &&
+          (localData.pricing_types || Array.isArray(localData))
+        ) {
           taipowerPricing.value = localData
           pricingCacheTimestamp.value = Date.now()
 
@@ -235,12 +264,10 @@ export const useCalculationStore = defineStore('calculation', () => {
             Date.now().toString(),
           )
 
-          const dataCount = localData.pricing_types ? localData.pricing_types.length : localData.length
-          logger.info(
-            '✅ 成功載入本地完整定價資料，共',
-            dataCount,
-            '筆',
-          )
+          const dataCount = localData.pricing_types
+            ? localData.pricing_types.length
+            : localData.length
+          logger.info('✅ 成功載入本地完整定價資料，共', dataCount, '筆')
           pricingDataSource.value = 'local'
           return localData
         }
@@ -257,8 +284,7 @@ export const useCalculationStore = defineStore('calculation', () => {
           pricingDataSource.value = 'cache'
           return cachedData
         }
-      } catch (cacheError) {
-      }
+      } catch (cacheError) {}
 
       // **降級策略 3: 使用簡化備援資料 (最後手段)**
       taipowerPricing.value = fallbackPricingData
@@ -421,7 +447,8 @@ export const useCalculationStore = defineStore('calculation', () => {
           // 建立計費天數摘要
           let billingDaysSummary = ''
           if (verification.seasonalSplit) {
-            const { summerDays, nonSummerDays, totalDays } = verification.seasonalSplit
+            const { summerDays, nonSummerDays, totalDays } =
+              verification.seasonalSplit
             billingDaysSummary = `共 ${totalDays} 天 (夏月 ${summerDays} 天 / 非夏月 ${nonSummerDays} 天)`
           }
 
@@ -526,7 +553,11 @@ export const useCalculationStore = defineStore('calculation', () => {
     // 如果沒有快取或快取過期，嘗試載入本地完整資料
     try {
       const localData = await getTaipowerPricingData()
-      if (localData && (localData.pricing_types || (Array.isArray(localData) && localData.length > 0))) {
+      if (
+        localData &&
+        (localData.pricing_types ||
+          (Array.isArray(localData) && localData.length > 0))
+      ) {
         taipowerPricing.value = localData
         pricingCacheTimestamp.value = Date.now()
         pricingDataSource.value = 'local'

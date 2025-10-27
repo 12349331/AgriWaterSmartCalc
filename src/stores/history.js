@@ -187,7 +187,7 @@ export const useHistoryStore = defineStore('history', () => {
               'region',
               'notes',
               'pricingType',
-            ])
+            ]),
           }))
         }
       }

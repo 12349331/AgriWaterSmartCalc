@@ -18,10 +18,10 @@
       v-if="show"
       class="space-y-6"
     >
-      <!-- Pump Efficiency Input Field -->
+      <!-- Pump Efficiency Slider -->
       <div class="govuk-form-group">
         <label
-          for="efficiency"
+          id="efficiency-label"
           class="govuk-label"
         >
           抽水效率 <span class="text-danger">*</span>
@@ -50,33 +50,49 @@
         >
           ⚠️ {{ efficiencyWarning }}
         </p>
-        <input
-          id="efficiency"
-          :value="efficiency"
-          type="number"
-          step="0.01"
-          min="0"
-          max="1"
-          required
-          class="input-field w-full"
-          :class="{
-            'border-danger': errors.efficiency,
-            'border-yellow-500': !errors.efficiency && (warnings.efficiency || efficiencyWarning)
-          }"
-          :disabled="disabled"
-          aria-required="true"
-          :aria-invalid="errors.efficiency ? 'true' : 'false'"
-          :aria-describedby="[
-            errors.efficiency ? 'efficiency-error' : null,
-            warnings.efficiency ? 'efficiency-warning' : null,
-            efficiencyWarning ? 'efficiency-input-warning' : null
-          ].filter(Boolean).join(' ') || undefined"
-          data-testid="efficiency-input"
-          @input="emit('update:efficiency', parseFloat($event.target.value))"
-          @keydown="emit('keydown', $event)"
-          @paste="emit('paste', $event)"
-          @blur="emit('blur', $event)"
-        >
+
+        <!-- Slider with percentage input -->
+        <div class="flex items-center gap-4 mt-2">
+          <van-slider
+            :model-value="efficiency"
+            :min="0"
+            :max="1"
+            :step="0.01"
+            :disabled="disabled"
+            :active-color="errors.efficiency ? '#d4351c' : '#1989fa'"
+            :bar-height="6"
+            :button-size="28"
+            class="flex-1"
+            aria-labelledby="efficiency-label"
+            aria-required="true"
+            :aria-invalid="errors.efficiency ? 'true' : 'false'"
+            :aria-describedby="[
+              errors.efficiency ? 'efficiency-error' : null,
+              warnings.efficiency ? 'efficiency-warning' : null,
+              efficiencyWarning ? 'efficiency-input-warning' : null
+            ].filter(Boolean).join(' ') || undefined"
+            data-testid="efficiency-slider"
+            @update:model-value="emit('update:efficiency', $event)"
+          />
+          <div class="flex items-center gap-2 min-w-[6rem]">
+            <input
+              :value="Math.round(efficiency * 100)"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              :disabled="disabled"
+              class="w-16 text-center text-xl font-semibold border border-gray-300 rounded px-2 py-1 bg-white"
+              :class="{
+                'border-red-500': errors.efficiency,
+                'border-yellow-500': !errors.efficiency && (warnings.efficiency || efficiencyWarning)
+              }"
+              data-testid="efficiency-percentage-input"
+              @input="handlePercentageInput"
+            >
+            <span class="text-xl font-semibold text-gray-700">%</span>
+          </div>
+        </div>
       </div>
 
       <!-- Parameter Explanations -->
@@ -140,5 +156,16 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['update:show', 'update:efficiency', 'keydown', 'paste', 'blur'])
+const emit = defineEmits(['update:show', 'update:efficiency'])
+
+// Handle percentage input (convert from 0-100 to 0-1)
+function handlePercentageInput(event) {
+  const percentage = parseFloat(event.target.value)
+  if (!isNaN(percentage)) {
+    // Clamp between 0 and 100, then convert to 0-1 range
+    const clampedPercentage = Math.max(0, Math.min(100, percentage))
+    const efficiency = clampedPercentage / 100
+    emit('update:efficiency', efficiency)
+  }
+}
 </script>

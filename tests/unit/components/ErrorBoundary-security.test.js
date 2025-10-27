@@ -205,7 +205,7 @@ describe('ErrorBoundary - 安全性測試', () => {
       await nextTick()
 
       const reloadButton = wrapper.findAll('button').find(btn => 
-        btn.text().includes('重新整理頁面') && !btn.text().includes('清除')
+        btn.text().includes('重新整理頁面') && !btn.text().includes('清除'),
       )
 
       expect(reloadButton).toBeTruthy()
@@ -227,7 +227,7 @@ describe('ErrorBoundary - 安全性測試', () => {
       await nextTick()
 
       const clearButton = wrapper.findAll('button').find(btn => 
-        btn.text().includes('清除資料並重新整理')
+        btn.text().includes('清除資料並重新整理'),
       )
 
       expect(clearButton).toBeTruthy()
