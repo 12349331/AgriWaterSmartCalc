@@ -1,41 +1,52 @@
 <!doctype html>
 <html lang="zh-TW">
   <head>
+    <!-- Essential Meta Tags - Must be first -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
 
     <!-- Primary Meta Tags -->
     <title>💧 水資源查詢與估算平台</title>
     <meta name="title" content="💧 水資源查詢與估算平台" />
     <meta name="description" content="以電推水 - 農業用水量估算工具" />
-    <meta name="keywords" content="農業用水,水資源管理,灌溉,地下水,台電電費,智慧農業,永續農業,用水量計算" />
+    <meta
+      name="keywords"
+      content="農業用水,水資源管理,灌溉,地下水,台電電費,智慧農業,永續農業,用水量計算"
+    />
     <meta name="author" content="AquaMetrics" />
+    <meta name="application-name" content="AquaMetrics" />
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://aquametrics.netlify.app/" />
     <meta property="og:title" content="💧 水資源查詢與估算平台" />
     <meta property="og:description" content="以電推水 - 農業用水量估算工具" />
-    <meta property="og:image" content="/og-image.png" />
     <meta property="og:locale" content="zh_TW" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://aquametrics.netlify.app/" />
     <meta property="twitter:title" content="💧 水資源查詢與估算平台" />
-    <meta property="twitter:description" content="以電推水 - 農業用水量估算工具" />
-    <meta property="twitter:image" content="/og-image.png" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta
+      property="twitter:description"
+      content="以電推水 - 農業用水量估算工具"
+    />
 
     <!-- Theme Color -->
     <meta name="theme-color" content="#3b82f6" />
     <meta name="msapplication-TileColor" content="#3b82f6" />
 
-    <!-- Robots -->
-    <meta name="robots" content="index, follow" />
+    <!-- SEO & Crawling -->
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
     <meta name="googlebot" content="index, follow" />
 
     <!-- Canonical -->
@@ -43,10 +54,19 @@
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Performance: DNS Prefetch & Preconnect for external resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+
+    <!-- Favicon (using a simple approach - add actual file later) -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>"
+    />
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
-
