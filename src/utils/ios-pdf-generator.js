@@ -16,7 +16,7 @@ import logger from './logger'
  * @param {jsPDF} doc - jsPDF instance
  * @returns {Promise<boolean>} True if font loaded successfully
  */
-async function loadChineseFont(doc) {
+async function loadChineseFont() {
   try {
     logger.warn('⚠️ Using default font (Helvetica) for iOS PDF - English text only')
     logger.info('💡 iOS PDF will display in English due to font limitations')
@@ -50,7 +50,7 @@ export async function generateIOSPDF(templateElement, calculationStore, historyS
     })
 
     // Load Chinese font (with fallback)
-    const fontLoaded = await loadChineseFont(doc)
+    const fontLoaded = await loadChineseFont()
 
     // Page settings
     const pageWidth = doc.internal.pageSize.getWidth()
@@ -264,7 +264,7 @@ export async function generateIOSPDF(templateElement, calculationStore, historyS
       `© ${new Date().getFullYear()} Water Resource Estimation Platform`,
       pageWidth / 2,
       footerY,
-      { align: 'center' }
+      { align: 'center' },
     )
 
     // Add page numbers
