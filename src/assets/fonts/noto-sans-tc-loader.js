@@ -102,7 +102,7 @@ export async function loadNotoSansTCFromGoogleFonts() {
     const fontArrayBuffer = await response.arrayBuffer()
     const base64String = arrayBufferToBase64(fontArrayBuffer)
 
-    logger.info(`✅ Google Fonts 字型載入成功`)
+    logger.info('✅ Google Fonts 字型載入成功')
 
     return base64String
   } catch (error) {

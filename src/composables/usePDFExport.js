@@ -54,7 +54,7 @@ export function usePDFExport() {
           templateElement,
           calculationStore,
           historyStore,
-          chartImages
+          chartImages,
         )
 
         return result
