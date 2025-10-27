@@ -441,8 +441,25 @@ const handlePDFExport = async () => {
     logger.info('等待圖片載入...')
     await new Promise(resolve => setTimeout(resolve, 1000))
 
-    // 生成 PDF
-    const result = await generatePDF(pdfTemplateRef.value.pdfTemplateRef)
+    // 收集圖表圖片（用於 iOS PDF 生成器）
+    const chartImages = []
+    const chartContainers = pdfTemplateRef.value.pdfTemplateRef.querySelectorAll('.chart-container')
+    chartContainers.forEach((container, index) => {
+      const img = container.querySelector('img')
+      if (img && img.src) {
+        chartImages.push({
+          title: `圖表 ${index + 1}`,
+          imageData: img.src,
+        })
+      }
+    })
+
+    // 生成 PDF（傳入 stores 和圖表圖片以支援 iOS）
+    const result = await generatePDF(pdfTemplateRef.value.pdfTemplateRef, {
+      calculationStore,
+      historyStore,
+      chartImages,
+    })
     uiStore.setSuccess(`PDF 報告已生成（耗時 ${result.duration} 秒）`)
   } catch (error) {
     logger.error('PDF 生成失敗', { error })
