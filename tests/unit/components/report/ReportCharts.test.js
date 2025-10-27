@@ -77,9 +77,10 @@ describe('ReportCharts.vue', () => {
     expect(seasonalChart.props('records').length).toBeGreaterThan(0)
   })
 
-  it('displays "暫無數據" when no records', () => {
+  it('displays "暫無數據" when no records', async () => {
     historyStore.clearAllRecords()
 
+    await wrapper.vm.$nextTick()
     const text = wrapper.text()
     expect(text).toContain('暫無數據')
 

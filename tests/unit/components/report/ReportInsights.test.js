@@ -116,22 +116,24 @@ describe('ReportInsights.vue', () => {
     expect(callArg).toHaveProperty('minWaterUsage')
   })
 
-  it('handles empty history', () => {
+  it('handles empty history', async () => {
     historyStore.clearAllRecords()
 
+    await wrapper.vm.$nextTick()
     const text = wrapper.text()
     expect(text).toContain('0 次')
     expect(text).toContain('0.0 m³')
     expect(text).toContain('0.0 kWh')
   })
 
-  it('formats values with one decimal place', () => {
+  it('formats values with one decimal place', async () => {
     historyStore.clearAllRecords()
     historyStore.addRecord({
       calculatedKwh: 123.456,
       monthlyVolume: 78.912,
     })
 
+    await wrapper.vm.$nextTick()
     const text = wrapper.text()
     expect(text).toContain('78.9')
     expect(text).toContain('123.5')

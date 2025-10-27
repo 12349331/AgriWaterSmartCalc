@@ -41,8 +41,18 @@ describe('PDFTemplate.vue', () => {
   })
 
   it('renders components in correct order', () => {
-    const stubs = wrapper.findAllComponents({ name: /Report/ })
-    expect(stubs.length).toBeGreaterThanOrEqual(5)
+    // Check that all report components are rendered
+    const reportHeader = wrapper.findComponent({ name: 'ReportHeader' })
+    const reportParams = wrapper.findComponent({ name: 'ReportParameters' })
+    const reportStats = wrapper.findComponent({ name: 'ReportStats' })
+    const reportCharts = wrapper.findComponent({ name: 'ReportCharts' })
+    const reportInsights = wrapper.findComponent({ name: 'ReportInsights' })
+
+    expect(reportHeader.exists()).toBe(true)
+    expect(reportParams.exists()).toBe(true)
+    expect(reportStats.exists()).toBe(true)
+    expect(reportCharts.exists()).toBe(true)
+    expect(reportInsights.exists()).toBe(true)
   })
 
   it('displays footer with copyright', () => {

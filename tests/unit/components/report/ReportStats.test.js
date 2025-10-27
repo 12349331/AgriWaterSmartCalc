@@ -87,7 +87,7 @@ describe('ReportStats.vue', () => {
     expect(text).toContain('0.0')
   })
 
-  it('formats values with one decimal place', () => {
+  it('formats values with one decimal place', async () => {
     // Add record with decimal values
     historyStore.clearAllRecords()
     historyStore.addRecord({
@@ -95,6 +95,7 @@ describe('ReportStats.vue', () => {
       monthlyVolume: 78.9,
     })
 
+    await wrapper.vm.$nextTick()
     const text = wrapper.text()
     expect(text).toContain('123.5') // kWh rounded to 1 decimal
     expect(text).toContain('78.9') // Volume with 1 decimal
