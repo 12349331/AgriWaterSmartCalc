@@ -2,7 +2,7 @@
   <div class="result-card mt-4">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-semibold">
-        進階參數調整與參數說明
+        進階參數
       </h3>
       <button
         type="button"
@@ -27,7 +27,7 @@
           抽水效率 <span class="text-danger">*</span>
         </label>
         <p class="govuk-hint">
-          預設值: 0.75 (75%)，範圍: 0.0-1.0
+          預設值: 0.45 (45%)，範圍: 0.0-1.0
         </p>
         <p
           v-if="errors.efficiency"
@@ -95,7 +95,7 @@
             抽水效率
           </dt>
           <dd class="text-gray-600 mt-1">
-            抽水機將電能轉換為水力能的效率，以小數表示（例如 0.75 代表 75% 效率）。效率越高，相同用電下可抽取更多水量。
+            抽水機將電能轉換為水力能的效率，以小數表示（例如 0.45 代表 45% 效率）。效率越高，相同用電下可抽取更多水量。
           </dd>
         </div>
 
