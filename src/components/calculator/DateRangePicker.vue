@@ -207,21 +207,21 @@ const maxDate = computed(() => new Date(props.maxDate))
 const startDateArray = ref(
   props.startDate
     ? [
-        new Date(props.startDate).getFullYear().toString(),
-        String(new Date(props.startDate).getMonth() + 1).padStart(2, '0'),
-        String(new Date(props.startDate).getDate()).padStart(2, '0')
-      ]
-    : [new Date().getFullYear().toString(), '01', '01']
+      new Date(props.startDate).getFullYear().toString(),
+      String(new Date(props.startDate).getMonth() + 1).padStart(2, '0'),
+      String(new Date(props.startDate).getDate()).padStart(2, '0'),
+    ]
+    : [new Date().getFullYear().toString(), '01', '01'],
 )
 
 const endDateArray = ref(
   props.endDate
     ? [
-        new Date(props.endDate).getFullYear().toString(),
-        String(new Date(props.endDate).getMonth() + 1).padStart(2, '0'),
-        String(new Date(props.endDate).getDate()).padStart(2, '0')
-      ]
-    : [new Date().getFullYear().toString(), '01', '01']
+      new Date(props.endDate).getFullYear().toString(),
+      String(new Date(props.endDate).getMonth() + 1).padStart(2, '0'),
+      String(new Date(props.endDate).getDate()).padStart(2, '0'),
+    ]
+    : [new Date().getFullYear().toString(), '01', '01'],
 )
 
 // Computed end min date (should be after start date)
@@ -275,7 +275,7 @@ watch(() => props.startDate, (newVal) => {
     startDateArray.value = [
       date.getFullYear().toString(),
       String(date.getMonth() + 1).padStart(2, '0'),
-      String(date.getDate()).padStart(2, '0')
+      String(date.getDate()).padStart(2, '0'),
     ]
   }
 })
@@ -286,7 +286,7 @@ watch(() => props.endDate, (newVal) => {
     endDateArray.value = [
       date.getFullYear().toString(),
       String(date.getMonth() + 1).padStart(2, '0'),
-      String(date.getDate()).padStart(2, '0')
+      String(date.getDate()).padStart(2, '0'),
     ]
   }
 })

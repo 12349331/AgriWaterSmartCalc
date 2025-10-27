@@ -184,22 +184,33 @@
         </div>
       </div>
     </div>
+
+    <!-- PDF Template (Hidden but visible for rendering) -->
+    <div
+      v-if="showPDFTemplate"
+      style="position: fixed; left: -9999px; top: 0; width: 210mm; opacity: 0; pointer-events: none; z-index: -1;"
+    >
+      <PDFTemplate ref="pdfTemplateRef" />
+    </div>
   </ErrorBoundary>
 </template>
 
 <script setup>
 import logger from '@/utils/logger'
-import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent, nextTick } from 'vue'
 import { useCalculationStore } from '@/stores/calculation'
 import { useHistoryStore } from '@/stores/history'
 import { useUiStore } from '@/stores/ui'
 import { calculateStats } from '@/utils/chartHelpers'
+import { usePDFExport } from '@/composables/usePDFExport'
+import { convertChartsToImages } from '@/utils/chart-to-image'
 import ErrorBoundary from '@/components/common/ErrorBoundary.vue'
 import OfflineNotice from '@/components/common/OfflineNotice.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import CalculatorForm from '@/components/calculator/CalculatorForm.vue'
 import AdvancedParams from '@/components/calculator/AdvancedParams.vue'
 import ResultCard from '@/components/calculator/ResultCard.vue'
+import PDFTemplate from '@/components/report/PDFTemplate.vue'
 
 // Lazy load heavy components
 const HistoryTable = defineAsyncComponent(
@@ -228,6 +239,11 @@ const AnnualTrendChart = defineAsyncComponent(
 const calculationStore = useCalculationStore()
 const historyStore = useHistoryStore()
 const uiStore = useUiStore()
+const { generatePDF } = usePDFExport()
+
+// PDF Template ref
+const pdfTemplateRef = ref(null)
+const showPDFTemplate = ref(false)
 
 // State
 const formData = ref({})
@@ -381,7 +397,64 @@ const handleSaveRecordEdit = (updatedRecord) => {
   }
 }
 
-const handleExport = (format) => {
+// PDF Export Handler
+const handlePDFExport = async () => {
+  try {
+    if (historyStore.recordCount === 0) {
+      uiStore.setError('無歷史記錄可匯出')
+      return
+    }
+
+    uiStore.setLoading(true)
+
+    // 顯示 PDF 模板（隱藏渲染）
+    showPDFTemplate.value = true
+
+    // 等待 DOM 更新
+    await nextTick()
+
+    // 確保模板已掛載
+    if (!pdfTemplateRef.value || !pdfTemplateRef.value.pdfTemplateRef) {
+      throw new Error('PDF 模板尚未準備好')
+    }
+
+    // 等待 Vue 異步組件和 ECharts 圖表完全渲染
+    // 使用固定的等待時間，因為異步組件需要時間載入
+    logger.info('等待圖表組件載入和渲染...')
+
+    // 第一階段：等待異步組件載入 (1.5秒)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    await nextTick()
+
+    // 第二階段：等待 ECharts 初始化和渲染 (2.5秒)
+    await new Promise(resolve => setTimeout(resolve, 2500))
+    await nextTick()
+
+    logger.info('圖表渲染完成，開始檢查...')
+
+    // **關鍵步驟**：將 ECharts 圖表轉換為靜態圖片
+    // 這樣 html2pdf.js 才能正確處理
+    logger.info('開始轉換圖表為圖片...')
+    await convertChartsToImages(pdfTemplateRef.value.pdfTemplateRef)
+
+    // 再等待一下，確保圖片已載入
+    logger.info('等待圖片載入...')
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // 生成 PDF
+    const result = await generatePDF(pdfTemplateRef.value.pdfTemplateRef)
+    uiStore.setSuccess(`PDF 報告已生成（耗時 ${result.duration} 秒）`)
+  } catch (error) {
+    logger.error('PDF 生成失敗', { error })
+    uiStore.setError('PDF 生成失敗，請稍後再試')
+  } finally {
+    // 清理：隱藏模板
+    showPDFTemplate.value = false
+    uiStore.setLoading(false)
+  }
+}
+
+const handleExport = async (format) => {
   try {
     if (format === 'csv') {
       historyStore.downloadCSV()
@@ -389,6 +462,8 @@ const handleExport = (format) => {
     } else if (format === 'json') {
       historyStore.downloadJSON()
       uiStore.setSuccess('JSON 檔案已下載')
+    } else if (format === 'pdf') {
+      await handlePDFExport()
     }
   } catch (error) {
     uiStore.setError(error.message || '匯出失敗')

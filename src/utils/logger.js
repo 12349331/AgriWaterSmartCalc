@@ -142,18 +142,18 @@ function log(level, ...args) {
 
   // 選擇對應的 console 方法
   switch (level) {
-    case LogLevel.DEBUG:
-      console.debug(...formattedArgs)
-      break
-    case LogLevel.INFO:
-      console.log(...formattedArgs)
-      break
-    case LogLevel.WARN:
-      console.warn(...formattedArgs)
-      break
-    case LogLevel.ERROR:
-      console.error(...formattedArgs)
-      break
+  case LogLevel.DEBUG:
+    console.debug(...formattedArgs)
+    break
+  case LogLevel.INFO:
+    console.log(...formattedArgs)
+    break
+  case LogLevel.WARN:
+    console.warn(...formattedArgs)
+    break
+  case LogLevel.ERROR:
+    console.error(...formattedArgs)
+    break
   }
 }
 

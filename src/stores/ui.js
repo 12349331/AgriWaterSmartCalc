@@ -31,8 +31,11 @@ export const useUiStore = defineStore('ui', () => {
   }
 
   function checkOnlineStatus() {
-    isOffline.value = !navigator.onLine
+    // 初始檢查：優先相信瀏覽器是 online 的，避免誤報
+    // 在開發環境中，navigator.onLine 可能不準確
+    isOffline.value = false
 
+    // 監聽實際的網路狀態變化
     window.addEventListener('online', () => {
       isOffline.value = false
     })
@@ -40,6 +43,18 @@ export const useUiStore = defineStore('ui', () => {
     window.addEventListener('offline', () => {
       isOffline.value = true
     })
+
+    // 僅在明確檢測到離線時才設為 true
+    if (!navigator.onLine) {
+      // 嘗試發送一個簡單的請求來驗證
+      fetch('/favicon.svg', { method: 'HEAD', cache: 'no-cache' })
+        .then(() => {
+          isOffline.value = false // 可以連線，覆蓋 navigator.onLine 的結果
+        })
+        .catch(() => {
+          isOffline.value = true // 確實無法連線
+        })
+    }
   }
 
   function setActiveTab(tab) {

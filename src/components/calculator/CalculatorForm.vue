@@ -581,7 +581,7 @@ const validationAnnouncement = computed(() => {
         cropType: '作物類型',
         horsepower: '抽水馬力',
         efficiency: '抽水效率',
-        wellDepth: '水井深度'
+        wellDepth: '水井深度',
       }[field] || field
 
       messages.push(`${fieldLabel}: ${error}`)
@@ -593,7 +593,7 @@ const validationAnnouncement = computed(() => {
     if (warning) {
       const fieldLabel = {
         efficiency: '抽水效率',
-        wellDepth: '水井深度'
+        wellDepth: '水井深度',
       }[field] || field
 
       messages.push(`${fieldLabel}警告: ${warning}`)

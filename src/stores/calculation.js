@@ -83,7 +83,7 @@ export const useCalculationStore = defineStore('calculation', () => {
     return reverseBillToKwh(
       billAmount.value,
       billingPeriodStart.value,
-      billingPeriodEnd.value
+      billingPeriodEnd.value,
     )
   })
 

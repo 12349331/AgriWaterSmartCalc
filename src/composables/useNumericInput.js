@@ -25,7 +25,7 @@ export function useNumericInput(options = {}) {
   const ALLOWED_KEYS = [
     'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
     'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-    'Home', 'End'
+    'Home', 'End',
   ]
 
   /**

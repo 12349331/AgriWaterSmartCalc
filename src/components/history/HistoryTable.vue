@@ -21,6 +21,13 @@
         </button>
         <button
           v-if="recordsToDisplay.length > 0"
+          class="text-sm px-3 py-1 border border-gray-300 rounded-sm hover:bg-gray-50"
+          @click="emit('export', 'pdf')"
+        >
+          匯出 PDF
+        </button>
+        <button
+          v-if="recordsToDisplay.length > 0"
           class="text-sm px-3 py-1 text-red-600 hover:text-red-800"
           @click="emit('clear-all')"
         >
