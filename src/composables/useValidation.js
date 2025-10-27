@@ -32,10 +32,10 @@ export function useValidation() {
 
       // Soft validation (only if hard validation passed)
       let warning = null
-      if (num < 0.5) {
-        warning = '效率值偏低(通常為 0.6-0.85),請確認'
+      if (num < 0.2) {
+        warning = '效率值偏低(通常為 0.25-0.85),請確認'
       } else if (num > 0.9) {
-        warning = '效率值偏高(通常為 0.6-0.85),請確認'
+        warning = '效率值偏高(通常為 0.25-0.85),請確認'
       }
 
       return { error: null, warning }
