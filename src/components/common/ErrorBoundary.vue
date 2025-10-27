@@ -25,18 +25,26 @@
       </p>
 
       <details
-        v-if="errorDetails"
+        v-if="errorDetails && isDevelopment"
         class="mb-6 text-left"
       >
         <summary
           class="cursor-pointer text-sm text-gray-500 hover:text-gray-700"
         >
-          查看錯誤詳情
+          查看錯誤詳情（開發模式）
         </summary>
         <pre class="mt-2 p-4 bg-gray-100 rounded-sm text-xs overflow-auto">{{
           errorDetails
         }}</pre>
       </details>
+
+      <!-- Production-friendly error ID for support -->
+      <div
+        v-if="!isDevelopment && errorId"
+        class="mb-6 text-sm text-gray-500"
+      >
+        錯誤代碼：{{ errorId }}
+      </div>
 
       <div class="space-y-3">
         <button
@@ -63,19 +71,59 @@
 
 <script setup>
 import logger from '@/utils/logger'
-import { ref, onErrorCaptured } from 'vue'
+import { ref, onErrorCaptured, computed } from 'vue'
 
 const hasError = ref(false)
 const errorDetails = ref('')
+const errorId = ref('')
+
+// 判斷是否為開發環境
+// 可透過 props 覆寫（主要用於測試）
+const props = defineProps({
+  forceDevelopmentMode: {
+    type: Boolean,
+    default: undefined,
+  },
+})
+
+const isDevelopment = computed(() => {
+  // 如果有明確指定，則使用指定值（用於測試）
+  if (props.forceDevelopmentMode !== undefined) {
+    return props.forceDevelopmentMode
+  }
+  // 否則根據環境變數判斷
+  return import.meta.env.DEV || import.meta.env.MODE === 'development'
+})
+
+// 生成錯誤 ID（用於正式環境的錯誤追蹤）
+function generateErrorId() {
+  const timestamp = Date.now().toString(36)
+  const randomStr = Math.random().toString(36).substring(2, 7)
+  return `ERR-${timestamp}-${randomStr}`.toUpperCase()
+}
 
 onErrorCaptured((err, instance, info) => {
   hasError.value = true
-  errorDetails.value = `Error: ${err.message}\nInfo: ${info}\nStack: ${err.stack}`
+  
+  // 生成唯一的錯誤 ID
+  const currentErrorId = generateErrorId()
+  errorId.value = currentErrorId
+  
+  // 在開發環境顯示完整錯誤訊息
+  if (isDevelopment.value) {
+    errorDetails.value = `Error: ${err.message}\nInfo: ${info}\nStack: ${err.stack}`
+  }
 
-  // Log to console for debugging
-  logger.error('Error boundary caught:', err, instance, info)
+  // 記錄完整錯誤到 logger（包含錯誤 ID）
+  logger.error(`[${currentErrorId}] Error boundary caught:`, {
+    error: err,
+    message: err.message,
+    stack: err.stack,
+    info,
+    component: instance,
+  })
 
-  // Prevent error from propagating
+  // 防止錯誤繼續傳播
   return false
 })
 

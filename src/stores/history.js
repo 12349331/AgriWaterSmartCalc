@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import logger from '@/utils/logger'
 import { v4 as uuidv4 } from 'uuid'
 import { getCurrentTimestampTW } from '../utils/timezone' // T024: Import timezone utility
+import { sanitizeObject } from '@/utils/sanitizer'
+import { encodeData, decodeData } from '@/utils/dataEncoder'
 
 export const useHistoryStore = defineStore('history', () => {
   // State
@@ -94,12 +96,20 @@ export const useHistoryStore = defineStore('history', () => {
 
   // Actions
   function addRecord(recordData) { // T024: Modify to include billingPeriodStart & billingPeriodEnd
+    // 淨化使用者可輸入的文字欄位，防止 XSS 攻擊
+    const sanitizedData = sanitizeObject(recordData, [
+      'cropType',
+      'region',
+      'notes',
+      'pricingType',
+    ])
+
     const newRecord = {
       id: uuidv4(),
       timestamp: getCurrentTimestampTW(), // Use getCurrentTimestampTW() for GMT+8 (FR-013)
       billingPeriodStart: recordData.billingPeriodStart || null, // Ensure these fields are saved
       billingPeriodEnd: recordData.billingPeriodEnd || null,     // Can be null if not provided
-      ...recordData,
+      ...sanitizedData,
     }
 
     records.value.push(newRecord)
@@ -115,9 +125,17 @@ export const useHistoryStore = defineStore('history', () => {
       throw new Error('Record not found')
     }
 
+    // 淨化更新的資料，防止 XSS 攻擊
+    const sanitizedUpdates = sanitizeObject(updates, [
+      'cropType',
+      'region',
+      'notes',
+      'pricingType',
+    ])
+
     records.value[index] = {
       ...records.value[index],
-      ...updates,
+      ...sanitizedUpdates,
       updatedAt: getCurrentTimestampTW(), // Use for GMT+8
     }
 
@@ -143,10 +161,12 @@ export const useHistoryStore = defineStore('history', () => {
 
   function saveToLocalStorage() {
     try {
-      localStorage.setItem(
-        'aquametrics_history',
-        JSON.stringify(records.value),
-      )
+      const encoded = encodeData(records.value)
+      if (encoded) {
+        localStorage.setItem('aquametrics_history', encoded)
+      } else {
+        throw new Error('編碼失敗')
+      }
     } catch (error) {
       logger.error('Failed to save to localStorage:', error)
       throw new Error('儲存失敗，可能空間不足')
@@ -157,7 +177,19 @@ export const useHistoryStore = defineStore('history', () => {
     try {
       const saved = localStorage.getItem('aquametrics_history')
       if (saved) {
-        records.value = JSON.parse(saved)
+        const decoded = decodeData(saved)
+        if (decoded && Array.isArray(decoded)) {
+          // 淨化載入的資料，防止手動修改 localStorage 注入惡意內容
+          records.value = decoded.map(record => ({
+            ...record,
+            ...sanitizeObject(record, [
+              'cropType',
+              'region',
+              'notes',
+              'pricingType',
+            ])
+          }))
+        }
       }
     } catch (error) {
       logger.error('Failed to load from localStorage:', error)
