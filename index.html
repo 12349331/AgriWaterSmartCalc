@@ -1,72 +1,91 @@
 <!doctype html>
 <html lang="zh-TW">
   <head>
-    <!-- Essential Meta Tags - Must be first -->
+    <!-- 必要的基本 meta（請保持在最前面） -->
+    <!-- 註：指定文件編碼，避免中文亂碼 -->
     <meta charset="UTF-8" />
+    <!-- 註：響應式視窗設定，確保在行動裝置正常縮放顯示 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 註：啟用深淺色主題相容性，讓瀏覽器可使用 user-preferred color scheme -->
     <meta name="color-scheme" content="light dark" />
 
-    <!-- Primary Meta Tags -->
-    <title>💧 水資源查詢與估算平台</title>
-    <meta name="title" content="💧 水資源查詢與估算平台" />
+    <!-- 主要網頁資訊（供瀏覽器標題與搜尋引擎摘要使用） -->
+  <!-- 註：網頁標題，會顯示在分頁與搜尋結果標題中（已移除 emoji 避免與 favicon 重複顯示） -->
+  <title>水資源查詢與估算平台</title>
+  <!-- 註：meta title，部分社群平台或工具會使用此欄位 -->
+  <meta name="title" content="水資源查詢與估算平台" />
+    <!-- 註：網站描述，供搜尋引擎摘要或分享時顯示 -->
     <meta name="description" content="以電推水 - 農業用水量估算工具" />
+    <!-- 註：關鍵字（SEO 傳統欄位，現代搜尋引擎參考有限） -->
     <meta
       name="keywords"
       content="農業用水,水資源管理,灌溉,地下水,台電電費,智慧農業,永續農業,用水量計算"
     />
+    <!-- 註：作者或產品名，用於辨識來源 -->
     <meta name="author" content="AquaMetrics" />
     <meta name="application-name" content="AquaMetrics" />
 
-    <!-- Security Headers -->
+    <!-- 安全相關 header 設定（改善相容性與資訊洩漏風險） -->
+    <!-- 註：讓舊版 IE 使用最新渲染模式 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- 註：控制 referrer 傳送行為，減少跨域洩漏來源網址 -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- 註：避免行動裝置自動把數字辨識為電話連結 -->
     <meta name="format-detection" content="telephone=no" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph（社群分享時的豐富卡片資訊） -->
+    <!-- 註：網站類型（網站） -->
     <meta property="og:type" content="website" />
+    <!-- 註：分享時使用的 URL（請依實際部署修改） -->
     <meta property="og:url" content="https://aquametrics.netlify.app/" />
-    <meta property="og:title" content="💧 水資源查詢與估算平台" />
+  <!-- 註：分享卡片的標題（移除 emoji，分享卡片仍可使用圖像/og:image） -->
+  <meta property="og:title" content="水資源查詢與估算平台" />
+    <!-- 註：分享卡片的描述 -->
     <meta property="og:description" content="以電推水 - 農業用水量估算工具" />
+    <!-- 註：語系設定（Open Graph 使用下底線格式） -->
     <meta property="og:locale" content="zh_TW" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://aquametrics.netlify.app/" />
-    <meta property="twitter:title" content="💧 水資源查詢與估算平台" />
+    <!-- Twitter 卡片設定（若同時支援則顯示更佳） -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://aquametrics.netlify.app/" />
+  <meta property="twitter:title" content="水資源查詢與估算平台" />
     <meta
       property="twitter:description"
       content="以電推水 - 農業用水量估算工具"
     />
 
-    <!-- Theme Color -->
+    <!-- 主題色（部分行動瀏覽器或 PWA 會使用） -->
     <meta name="theme-color" content="#3b82f6" />
     <meta name="msapplication-TileColor" content="#3b82f6" />
 
-    <!-- SEO & Crawling -->
+    <!-- SEO 與爬蟲指示（告訴搜尋引擎如何索引本頁） -->
     <meta
       name="robots"
       content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
     />
     <meta name="googlebot" content="index, follow" />
 
-    <!-- Canonical -->
+    <!-- 正規化連結，避免重複內容被分散權重 -->
     <link rel="canonical" href="https://aquametrics.netlify.app/" />
 
-    <!-- PWA Manifest -->
+    <!-- PWA 清單檔（如果啟用 PWA，此檔案包含 icon、名稱等） -->
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Performance: DNS Prefetch & Preconnect for external resources -->
+    <!-- 效能優化：事先解析/連線到常用外部資源（如字型） -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
 
-    <!-- Favicon (using a simple approach - add actual file later) -->
+    <!-- 網站圖示（此處使用 inline SVG Data URI 作為簡易 favicon） -->
+    <!-- 註：可替換為實際檔案以改善快取與可管理性 -->
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>"
     />
   </head>
   <body>
+    <!-- 應用程式掛載點：Vue 或其他前端框架會把內容渲染到這裡 -->
     <div id="app"></div>
+    <!-- 主程式入口：以 module 方式載入，保留原始檔案路徑以供開發伺服器使用 -->
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
