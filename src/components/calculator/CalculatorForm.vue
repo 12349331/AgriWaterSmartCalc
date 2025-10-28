@@ -156,7 +156,7 @@
           for="crop-type"
           class="govuk-label"
         >
-          作物類型 <span class="text-danger">*</span>
+          記錄類型 <span class="text-danger">*</span>
         </label>
         <p
           v-if="errors.cropType"
@@ -174,7 +174,7 @@
           :aria-describedby="errors.cropType ? 'crop-type-error' : undefined"
         >
           <option value="">
-            請選擇作物
+            請選擇類型
           </option>
           <option
             v-for="crop in cropTypes"
