@@ -91,7 +91,7 @@
       <!-- Water Flow Rate (Q) -->
       <div class="bg-green-50 p-4 rounded-lg">
         <div class="text-sm text-gray-600">
-          每分鐘抽水量 (Q)
+          每秒鐘抽水量 (Q)
         </div>
         <div class="text-2xl font-bold text-green-700">
           {{ formatFlowRate(waterFlowRate) }}

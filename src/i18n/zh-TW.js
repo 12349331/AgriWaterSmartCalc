@@ -30,7 +30,7 @@ export default {
   results: {
     title: '計算結果',
     kwh: '推算用電度數',
-    flowRate: '每分鐘抽水量 (Q)',
+    flowRate: '每秒鐘抽水量 (Q)',
     monthlyVolume: '每月用水量 (V)',
     overExtraction: '用水量超過建議閾值',
     save: '儲存紀錄',
