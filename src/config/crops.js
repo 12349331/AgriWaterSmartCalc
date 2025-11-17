@@ -10,7 +10,7 @@ export const CROP_TYPES = [
       autumn: 0.9,
       winter: 1.1,
     },
-    description: "",
+    description: "一般住宅用電，夏季冷氣使用高峰",
   },
   {
     id: "rice",
@@ -22,7 +22,7 @@ export const CROP_TYPES = [
       autumn: 1.0,
       winter: 0.7,
     },
-    description: "",
+    description: "適用於稻米種植，需水量高",
   },
   {
     id: "leafy_greens",
@@ -34,7 +34,7 @@ export const CROP_TYPES = [
       autumn: 0.9,
       winter: 0.8,
     },
-    description: "",
+    description: "如高麗菜、萵苣等葉菜",
   },
   {
     id: "root_vegetables",
@@ -46,7 +46,7 @@ export const CROP_TYPES = [
       autumn: 1.0,
       winter: 0.85,
     },
-    description: "",
+    description: "如蘿蔔、馬鈴薯等根莖作物",
   },
   {
     id: "citrus",
@@ -58,7 +58,7 @@ export const CROP_TYPES = [
       autumn: 0.9,
       winter: 0.6,
     },
-    description: "",
+    description: "如柳丁、橘子等柑橘果樹",
   },
   {
     id: "mango",
@@ -70,7 +70,7 @@ export const CROP_TYPES = [
       autumn: 0.8,
       winter: 0.5,
     },
-    description: "",
+    description: "芒果果樹，夏季需水量大",
   },
   {
     id: "banana",
@@ -82,7 +82,7 @@ export const CROP_TYPES = [
       autumn: 1.1,
       winter: 0.9,
     },
-    description: "",
+    description: "香蕉種植，全年需水量高",
   },
   {
     id: "pineapple",
@@ -94,7 +94,7 @@ export const CROP_TYPES = [
       autumn: 0.8,
       winter: 0.6,
     },
-    description: "",
+    description: "鳳梨種植",
   },
   {
     id: "lychee",
@@ -106,7 +106,7 @@ export const CROP_TYPES = [
       autumn: 0.7,
       winter: 0.5,
     },
-    description: "",
+    description: "荔枝果樹",
   },
   {
     id: "guava",
@@ -118,6 +118,6 @@ export const CROP_TYPES = [
       autumn: 0.9,
       winter: 0.8,
     },
-    description: "",
+    description: "番石榴種植，全年生產（春夏季產量較旺盛）",
   },
 ];

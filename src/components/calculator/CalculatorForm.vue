@@ -181,7 +181,7 @@
             :key="crop.id"
             :value="crop.name"
           >
-            {{ crop.name }}{{ crop.description }}
+            {{ crop.name }} - {{ crop.description }}
           </option>
         </select>
       </div>
